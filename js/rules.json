@@ -1,0 +1,1158 @@
+{
+  "rulesVersion": "0.7",
+  "verbOrder": [
+    "admin",
+    "delete",
+    "create",
+    "update",
+    "read"
+  ],
+  "verbs": {
+    "read": [
+      "get",
+      "list",
+      "search",
+      "fetch",
+      "read",
+      "describe",
+      "show",
+      "lookup",
+      "find",
+      "status",
+      "check",
+      "view",
+      "count",
+      "head",
+      "tail",
+      "cat",
+      "download",
+      "query",
+      "select",
+      "watch",
+      "log",
+      "logs",
+      "info",
+      "userinfo",
+      "atlassianuserinfo"
+    ],
+    "create": [
+      "create",
+      "add",
+      "post",
+      "insert",
+      "upload",
+      "new",
+      "clone",
+      "copy",
+      "init"
+    ],
+    "update": [
+      "update",
+      "edit",
+      "set",
+      "write",
+      "put",
+      "patch",
+      "move",
+      "transition",
+      "merge",
+      "push",
+      "change",
+      "rename",
+      "apply",
+      "scale",
+      "restart",
+      "transfer",
+      "assign",
+      "reply",
+      "comment",
+      "resolve",
+      "submit",
+      "execute",
+      "run",
+      "start",
+      "stop"
+    ],
+    "delete": [
+      "delete",
+      "remove",
+      "drop",
+      "destroy",
+      "terminate",
+      "purge",
+      "truncate",
+      "close"
+    ],
+    "admin": [
+      "grant",
+      "revoke",
+      "admin",
+      "permission",
+      "invite",
+      "enable",
+      "disable",
+      "install",
+      "uninstall",
+      "impersonate",
+      "authorize",
+      "deauthorize"
+    ]
+  },
+  "controlHints": [
+    "iam",
+    "user",
+    "users",
+    "permission",
+    "role",
+    "grant",
+    "revoke",
+    "policy",
+    "setting",
+    "settings",
+    "config",
+    "admin",
+    "org",
+    "organization",
+    "workspace",
+    "member",
+    "token",
+    "credential",
+    "secret",
+    "key",
+    "account",
+    "auth"
+  ],
+  "sqlArgKeys": [
+    "sql",
+    "query",
+    "statement",
+    "command_text"
+  ],
+  "sqlCats": [
+    [
+      "admin",
+      "\\b(drop|alter|grant|revoke)\\b"
+    ],
+    [
+      "delete",
+      "\\b(delete|truncate)\\b"
+    ],
+    [
+      "update",
+      "\\bupdate\\b"
+    ],
+    [
+      "create",
+      "\\binsert\\b"
+    ],
+    [
+      "read",
+      "^\\s*(select|show|explain|describe|with)\\b"
+    ]
+  ],
+  "keyRules": [
+    {
+      "keys": [
+        "page_id",
+        "id"
+      ],
+      "type": "notion-page",
+      "whenTool": "^notion-",
+      "valueExtract": "([0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12})",
+      "stripChars": "-"
+    },
+    {
+      "keys": [
+        "database_id",
+        "data_source_id",
+        "data_source_url"
+      ],
+      "type": "notion-database",
+      "whenTool": "^notion-",
+      "valueExtract": "([0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12})",
+      "stripChars": "-"
+    },
+    {
+      "keys": [
+        "cloudid"
+      ],
+      "type": "atlassian-site"
+    },
+    {
+      "keys": [
+        "projectkey",
+        "projectkeyorid"
+      ],
+      "type": "jira-project"
+    },
+    {
+      "keys": [
+        "spacekey",
+        "spaceid"
+      ],
+      "type": "confluence-space"
+    },
+    {
+      "keys": [
+        "pageid"
+      ],
+      "type": "confluence-page"
+    },
+    {
+      "keys": [
+        "repo",
+        "repository"
+      ],
+      "type": "github-repo"
+    },
+    {
+      "keys": [
+        "owner",
+        "org",
+        "organization"
+      ],
+      "type": "github-org"
+    },
+    {
+      "keys": [
+        "database",
+        "db_name",
+        "dbname"
+      ],
+      "type": "db-database"
+    },
+    {
+      "keys": [
+        "schema"
+      ],
+      "type": "db-schema"
+    },
+    {
+      "keys": [
+        "table",
+        "table_name"
+      ],
+      "type": "db-table"
+    },
+    {
+      "keys": [
+        "warehouse"
+      ],
+      "type": "db-warehouse"
+    },
+    {
+      "keys": [
+        "collection"
+      ],
+      "type": "knowledge-collection"
+    },
+    {
+      "keys": [
+        "board_id",
+        "boardid"
+      ],
+      "type": "monday-board"
+    },
+    {
+      "keys": [
+        "channel",
+        "channel_id"
+      ],
+      "type": "slack-channel"
+    },
+    {
+      "keys": [
+        "bucket"
+      ],
+      "type": "aws"
+    },
+    {
+      "keys": [
+        "cluster",
+        "namespace"
+      ],
+      "type": "k8s"
+    }
+  ],
+  "jiraIssueKeys": [
+    "issueidorkey",
+    "issuekey"
+  ],
+  "urlKeys": [
+    "url",
+    "uri",
+    "endpoint",
+    "host",
+    "hostname"
+  ],
+  "cliVerbCats": {
+    "read": [
+      "describe",
+      "get",
+      "list",
+      "ls"
+    ],
+    "create": [
+      "create",
+      "put",
+      "run",
+      "start",
+      "add",
+      "attach"
+    ],
+    "update": [
+      "update",
+      "modify",
+      "set",
+      "tag",
+      "scale",
+      "apply",
+      "restart"
+    ],
+    "delete": [
+      "delete",
+      "terminate",
+      "remove",
+      "rm",
+      "detach"
+    ],
+    "admin": [
+      "grant",
+      "revoke",
+      "enable",
+      "disable"
+    ]
+  },
+  "commandPrefixSkip": [
+    "sudo",
+    "env",
+    "time",
+    "nohup",
+    "command",
+    "exec",
+    "builtin",
+    "do",
+    "then",
+    "else",
+    "elif",
+    "!",
+    "{",
+    "}",
+    "(",
+    ")",
+    "&&",
+    "||"
+  ],
+  "shellInterpreterRegex": "^(?:\\S*/)?(?:sh|bash|zsh|dash|ksh)\\s+(?:-[A-Za-z]+\\s+)*-[A-Za-z]*c\\s+(['\"])([\\s\\S]*?)\\1",
+  "maxNestedShellDepth": 2,
+  "shellRules": [
+    {
+      "kind": "cloud",
+      "bin": "aws",
+      "via": "aws",
+      "regex": "\\baws\\s+([a-z0-9-]+)\\s+([a-z0-9-]+)",
+      "type": "aws",
+      "rid": "aws:$1",
+      "verbGroups": [
+        2
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "gcloud",
+      "via": "gcloud",
+      "regex": "\\bgcloud\\s+([a-z0-9-]+)\\s+(?:[a-z0-9-]+\\s+)?([a-z0-9-]+)",
+      "type": "gcp",
+      "rid": "gcp:$1",
+      "verbGroups": [
+        2
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "az",
+      "via": "az",
+      "regex": "\\baz\\s+([a-z0-9-]+)\\s+([a-z0-9-]+)",
+      "type": "azure",
+      "rid": "azure:$1",
+      "verbGroups": [
+        2
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "oci",
+      "via": "oci",
+      "regex": "\\boci\\s+([a-z0-9-]+)\\s+([a-z0-9-]+)(?:\\s+([a-z0-9-]+))?",
+      "type": "oci",
+      "rid": "oci:$1",
+      "verbGroups": [
+        3,
+        2
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "kubectl",
+      "via": "kubectl",
+      "regex": "\\bkubectl\\s+([a-z-]+)(?:[^\\n;|]*?(?:-n|--namespace)[= ]([\\w-]+))?",
+      "type": "k8s",
+      "rid": "k8s-ns:$2||k8s:cluster",
+      "verbGroups": [
+        1
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "psql",
+      "via": "psql",
+      "regex": "\\bpsql\\b[^\\n;|]*?(?:-h[= ]?|--host[= ])([\\w.-]+)",
+      "type": "postgres",
+      "rid": "$1",
+      "verbGroups": [],
+      "sqlFromSegment": true
+    },
+    {
+      "kind": "cloud",
+      "bin": "mysql",
+      "via": "mysql",
+      "regex": "\\bmysql\\b[^\\n;|]*?(?:-h[= ]?|--host[= ])([\\w.-]+)",
+      "type": "mysql",
+      "rid": "$1",
+      "verbGroups": [],
+      "sqlFromSegment": true
+    },
+    {
+      "kind": "cloud",
+      "bin": "snowsql",
+      "via": "snowsql",
+      "regex": "\\bsnowsql\\b[^\\n;|]*?(?:-a[= ]?|--accountname[= ])([\\w.-]+)",
+      "type": "snowflake",
+      "rid": "$1",
+      "verbGroups": [],
+      "sqlFromSegment": true
+    },
+    {
+      "kind": "cloud",
+      "bin": "gh",
+      "via": "gh",
+      "regex": "\\bgh\\s+(?:pr|issue|repo|api|release)\\s+([a-z]+)?[^\\n;|]*?(?:(?:-R|--repo)[= ]([\\w.-]+/[\\w.-]+)|repos/([\\w.-]+/[\\w.-]+))",
+      "type": "github-repo",
+      "rid": "$2||$3",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "merge",
+        "comment",
+        "edit"
+      ]
+    },
+    {
+      "kind": "gitremote",
+      "bin": "git",
+      "via": "git",
+      "regex": "\\bgit\\b[^\\n;|]*\\b(clone|push|pull|fetch)\\b[^\\n;|]*?((?:https?://|git@)[^\\s\"']+)"
+    },
+    {
+      "kind": "curl",
+      "bin": "curl",
+      "via": "curl",
+      "regex": "\\bcurl\\b([^\\n;|]*?)(https?://[^\\s\"')]+)"
+    }
+  ],
+  "shellToolNames": [
+    "bash",
+    "exec_command",
+    "shell",
+    "local_shell"
+  ],
+  "webFetchToolNames": [
+    "webfetch",
+    "web_fetch"
+  ],
+  "localBuiltins": [
+    "read",
+    "edit",
+    "write",
+    "glob",
+    "grep",
+    "task",
+    "todowrite",
+    "todoread",
+    "askuserquestion",
+    "exitplanmode",
+    "enterplanmode",
+    "notebookedit",
+    "monitor",
+    "toolsearch",
+    "skill",
+    "artifact",
+    "listagents",
+    "sendmessage",
+    "workflow",
+    "reportfindings",
+    "schedulewakeup",
+    "senduserfile",
+    "structuredoutput"
+  ],
+  "infraServers": [
+    "workspace",
+    "cowork",
+    "visualize",
+    "ccd_session",
+    "ccd_directory",
+    "session_info",
+    "plugins",
+    "mcp-registry",
+    "scheduled-tasks",
+    "claude_preview",
+    "terminal",
+    "cowork-onboarding",
+    "plugin_apono-agentic_apono-feedback"
+  ],
+  "browserServers": [
+    "claude_in_chrome",
+    "claude-in-chrome",
+    "claude_browser"
+  ],
+  "gatewayAliases": [
+    "apono-agentic-local",
+    "apono-agentic-remote",
+    "apono",
+    "apono_mcp",
+    "apono_prod",
+    "apono-agentic",
+    "apono-gateway",
+    "apono_gw",
+    "apono_staging",
+    "apono-prod"
+  ],
+  "gatewayControlTools": [
+    "ask_access_assistant",
+    "create_access_request",
+    "get_request_details",
+    "list_available_resources",
+    "list_resources_filtered",
+    "_proxy__setup_target",
+    "_proxy__list_targets"
+  ],
+  "gatewayWrapperRegex": "^apn_[0-9a-f]+__(.+)$",
+  "resourceGroups": {
+    "Cloud": [
+      "aws",
+      "gcp",
+      "azure",
+      "oci",
+      "k8s"
+    ],
+    "Databases": [
+      "postgres",
+      "mysql",
+      "db-database",
+      "db-schema",
+      "db-table",
+      "db-warehouse",
+      "snowflake"
+    ],
+    "SaaS apps": [
+      "atlassian-site",
+      "jira-project",
+      "confluence-space",
+      "confluence-page",
+      "knowledge-collection",
+      "monday-board",
+      "slack-channel",
+      "notion",
+      "mixpanel",
+      "okta",
+      "notion-page",
+      "notion-database"
+    ],
+    "Code hosting": [
+      "github-repo",
+      "github-org",
+      "git-remote"
+    ],
+    "Web": [
+      "web-domain"
+    ]
+  },
+  "reportGroups": [
+    "Cloud",
+    "Databases",
+    "SaaS apps",
+    "Other"
+  ],
+  "excludedGroupsNote": "General web browsing and code-hosting (GitHub/git) access are collected but not reported here, by configuration.",
+  "rowLimits": {
+    "default": 25
+  },
+  "maxViaPerResource": 3,
+  "hosts": [
+    {
+      "name": "Claude Code",
+      "presence": [
+        {
+          "root": "home",
+          "path": [
+            ".claude"
+          ],
+          "evidence": "~/.claude"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".claude.json"
+          ],
+          "evidence": "~/.claude.json"
+        }
+      ],
+      "mcpConfigs": [
+        {
+          "root": "home",
+          "path": [
+            ".claude.json"
+          ],
+          "jsonKeys": [
+            "mcpServers"
+          ],
+          "label": "global config"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".claude.json"
+          ],
+          "jsonKeys": [
+            "mcpServers"
+          ],
+          "expandProjects": {
+            "key": "projects",
+            "childFile": ".mcp.json",
+            "childLabel": ".mcp.json"
+          },
+          "label": "project config"
+        }
+      ],
+      "transcripts": [
+        {
+          "root": "home",
+          "path": [
+            ".claude",
+            "projects"
+          ],
+          "suffix": ".jsonl",
+          "parser": "claudeStream"
+        }
+      ]
+    },
+    {
+      "name": "Claude Desktop",
+      "presence": [
+        {
+          "root": "roaming",
+          "path": [
+            "Claude"
+          ],
+          "evidence": "Claude app data"
+        }
+      ],
+      "mcpConfigs": [
+        {
+          "root": "roaming",
+          "path": [
+            "Claude",
+            "claude_desktop_config.json"
+          ],
+          "jsonKeys": [
+            "mcpServers"
+          ],
+          "label": "desktop config"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Claude",
+            "Claude Extensions"
+          ],
+          "manifestDir": true,
+          "label": "desktop extension"
+        }
+      ],
+      "transcripts": [
+        {
+          "root": "roaming",
+          "path": [
+            "Claude",
+            "local-agent-mode-sessions"
+          ],
+          "suffix": "audit.jsonl",
+          "parser": "claudeStream"
+        }
+      ],
+      "gap": "Chat-mode conversations and claude.ai remote connectors are stored server-side and leave no local trace; only agent-mode sessions are covered."
+    },
+    {
+      "name": "Codex",
+      "presence": [
+        {
+          "root": "home",
+          "path": [
+            ".codex",
+            "config.toml"
+          ],
+          "evidence": "~/.codex"
+        }
+      ],
+      "mcpConfigs": [
+        {
+          "root": "home",
+          "path": [
+            ".codex",
+            "config.toml"
+          ],
+          "tomlSectionRegex": "^\\[mcp_servers\\.([^\\].]+)\\]",
+          "label": "config.toml"
+        }
+      ],
+      "transcripts": [
+        {
+          "root": "home",
+          "path": [
+            ".codex",
+            "sessions"
+          ],
+          "suffix": ".jsonl",
+          "parser": "codexStream"
+        }
+      ],
+      "gap": "Codex keeps a limited local session history (about a week observed); older activity is not visible."
+    },
+    {
+      "name": "Cursor",
+      "presence": [
+        {
+          "root": "home",
+          "path": [
+            ".cursor"
+          ],
+          "evidence": "~/.cursor"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Cursor",
+            "User",
+            "globalStorage",
+            "state.vscdb"
+          ],
+          "evidence": "Cursor app data"
+        }
+      ],
+      "mcpConfigs": [
+        {
+          "root": "home",
+          "path": [
+            ".cursor",
+            "mcp.json"
+          ],
+          "jsonKeys": [
+            "mcpServers"
+          ],
+          "label": "mcp.json"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".cursor",
+            "projects",
+            "*",
+            "mcps",
+            "*",
+            "SERVER_METADATA.json"
+          ],
+          "nameKeys": [
+            "serverIdentifier",
+            "serverName",
+            "name"
+          ],
+          "label": "cursor per-server metadata"
+        }
+      ],
+      "transcripts": [
+        {
+          "root": "roaming",
+          "path": [
+            "Cursor",
+            "User",
+            "globalStorage",
+            "state.vscdb"
+          ],
+          "parser": "vscodeSqliteSessions",
+          "sql": "select composerId from composerHeaders",
+          "countRows": true
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Cursor",
+            "User",
+            "globalStorage",
+            "state.vscdb"
+          ],
+          "parser": "vscodeSqliteSessions",
+          "sql": "select value from cursorDiskKV where key like 'composerData%'",
+          "conversationKey": "conversationMap"
+        }
+      ],
+      "gapStore": "Cursor's local store could not be read on this machine.",
+      "gap": "Cursor coverage is presence, configured MCP servers and a session count. Cursor 3.x moved conversation bodies into per-session stores encrypted with AES-GCM, so tool calls are deliberately not read; MCP attribution is available there as providerIdentifier/toolName if we later choose to. Note also that Cursor updates have been observed clearing local chat history, so 'no activity found' can mean history was wiped rather than unused. For forward-looking capture, Cursor's first-party afterMCPExecution hook reports server, tool, arguments and duration directly."
+    },
+    {
+      "name": "GitHub Copilot",
+      "presence": [
+        {
+          "root": "home",
+          "path": [
+            ".vscode",
+            "extensions"
+          ],
+          "childPrefix": "github.copilot-",
+          "evidence": "VS Code extension"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".vscode-insiders",
+            "extensions"
+          ],
+          "childPrefix": "github.copilot-",
+          "evidence": "VS Code Insiders extension"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".vscode-server",
+            "extensions"
+          ],
+          "childPrefix": "github.copilot-",
+          "evidence": "VS Code (WSL remote) extension"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".copilot"
+          ],
+          "evidence": "Copilot CLI"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".local",
+            "share",
+            "gh",
+            "extensions",
+            "gh-copilot"
+          ],
+          "evidence": "gh copilot extension"
+        }
+      ],
+      "mcpConfigs": [
+        {
+          "root": "roaming",
+          "path": [
+            "Code",
+            "User",
+            "mcp.json"
+          ],
+          "jsonKeys": [
+            "servers",
+            "mcpServers"
+          ],
+          "label": "VS Code user mcp.json"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".copilot",
+            "mcp-config.json"
+          ],
+          "jsonKeys": [
+            "mcpServers",
+            "servers"
+          ],
+          "label": "Copilot CLI mcp-config.json"
+        }
+      ],
+      "gap": "Copilot tool-call history is not readable locally in this version; presence and configured MCP servers only."
+    },
+    {
+      "name": "Google Antigravity",
+      "presence": [
+        {
+          "root": "home",
+          "path": [
+            ".gemini",
+            "antigravity-ide"
+          ],
+          "evidence": "~/.gemini/antigravity-ide (IDE 2.x)"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".gemini",
+            "antigravity"
+          ],
+          "evidence": "~/.gemini/antigravity (IDE 1.x)"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".gemini",
+            "antigravity-cli"
+          ],
+          "evidence": "~/.gemini/antigravity-cli (CLI)"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".antigravity-ide"
+          ],
+          "evidence": "~/.antigravity-ide"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Antigravity IDE"
+          ],
+          "evidence": "Antigravity IDE app data (2.x)"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Antigravity"
+          ],
+          "evidence": "Antigravity app data (1.x)"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".gemini",
+            "antigravity-browser-profile"
+          ],
+          "evidence": "browser-control Chrome profile"
+        }
+      ],
+      "mcpConfigs": [
+        {
+          "root": "home",
+          "path": [
+            ".gemini",
+            "config",
+            "mcp_config.json"
+          ],
+          "jsonKeys": [
+            "mcpServers"
+          ],
+          "disabledFlagKey": "disabled",
+          "label": "gemini mcp_config.json (2.x, unified)"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".gemini",
+            "antigravity",
+            "mcp_config.json"
+          ],
+          "jsonKeys": [
+            "mcpServers"
+          ],
+          "disabledFlagKey": "disabled",
+          "label": "antigravity mcp_config.json (1.x)"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".gemini",
+            "antigravity-cli",
+            "mcp_config.json"
+          ],
+          "jsonKeys": [
+            "mcpServers"
+          ],
+          "disabledFlagKey": "disabled",
+          "label": "antigravity-cli mcp_config.json"
+        }
+      ],
+      "gap": "Antigravity coverage is presence and configured MCP servers only. IDE conversation files (~/.gemini/antigravity-ide/conversations/*.pb) are encrypted with Electron safeStorage, so their tool calls are deliberately not read. The CLI does write plaintext JSONL transcripts including tool calls (~/.gemini/antigravity-cli/brain/<id>/.system_generated/logs/transcript_full.jsonl) -- extracting those needs a format-specific parser, not yet written. Workspace-local .agents/mcp_config.json files are not enumerated. Enterprise deployments can obtain agent tool-execution audit centrally via the Gemini Enterprise admin console."
+    }
+  ],
+  "agentOrder": [
+    "Claude Code",
+    "Claude Desktop",
+    "Codex",
+    "Cursor",
+    "GitHub Copilot"
+  ],
+  "genericGaps": [
+    "Access types are classified locally from tool names and command verbs; \"unclassified\" means no safe determination could be made -- it is never guessed.",
+    "Command-line access is counted only where a tool was actually invoked as a command. Command text quoted inside other commands, heredocs or scripts is deliberately ignored, so genuine access run inside a non-shell interpreter may be under-reported rather than over-reported."
+  ],
+  "viaLabels": {
+    "cli": "CLI",
+    "mcp": "MCP",
+    "browser": "Browser",
+    "builtin": "Built-in"
+  },
+  "redaction": {
+    "enabled": true,
+    "keepLast": 4,
+    "minLengthForReveal": 8,
+    "mask": "\u2022\u2022\u2022\u2022",
+    "tagLength": 4,
+    "preservePrefixes": [
+      "aws:",
+      "gcp:",
+      "azure:",
+      "oci:",
+      "k8s:",
+      "k8s-ns:"
+    ],
+    "defaultSalt": {
+      "mode": "emailDomain",
+      "sources": [
+        {
+          "root": "home",
+          "path": [
+            ".claude.json"
+          ],
+          "jsonPath": [
+            "oauthAccount",
+            "emailAddress"
+          ]
+        },
+        {
+          "root": "home",
+          "path": [
+            ".gitconfig"
+          ],
+          "regex": "email\\s*=\\s*([^\\s]+@[^\\s]+)"
+        },
+        {
+          "env": [
+            "EMAIL",
+            "GIT_AUTHOR_EMAIL",
+            "GIT_COMMITTER_EMAIL"
+          ]
+        }
+      ],
+      "note": "Redaction tags are salted with the organization's email domain by default, so every machine in the same organization redacts identically and the reports consolidate. The domain is not a secret -- for an assessment where short names must be unguessable, pass an explicit --salt instead."
+    },
+    "note": "Resource names are redacted: only the last {keepLast} characters are shown, and only where the name is long enough that this reveals little. Shorter names are masked completely. Every entry carries a short tag (#xxxx) derived from the full name so that distinct resources stay distinct in this report and match up correctly when reports from several machines are combined. The tag is a one-way hash; with an assessment salt (--salt) it cannot be reversed by guessing."
+  },
+  "connectorFingerprints": [
+    {
+      "toolPattern": "^notion-",
+      "name": "Notion"
+    },
+    {
+      "toolPattern": "^(get|create|update|search|edit|transition|addComment|lookup|atlassian)\\w*(Confluence|Jira|Atlassian)",
+      "name": "Atlassian"
+    },
+    {
+      "toolPattern": "^(get_board_info|create_item|create_items|change_item_column_values|list_users_and_teams|get_board_items)",
+      "name": "monday.com"
+    },
+    {
+      "toolPattern": "^(slack_|conversations_|chat_post)",
+      "name": "Slack"
+    },
+    {
+      "toolPattern": "^(figma_|get_figma)",
+      "name": "Figma"
+    }
+  ],
+  "serviceRules": [
+    {
+      "toolPattern": "^notion-",
+      "type": "notion",
+      "rid": "Notion workspace"
+    },
+    {
+      "toolPattern": "\\w*(Confluence|Jira)\\w*",
+      "type": "atlassian-site",
+      "rid": "Atlassian (site not named)"
+    },
+    {
+      "toolPattern": "^knowledge_",
+      "type": "knowledge-collection",
+      "rid": "knowledge (collection not named)"
+    }
+  ],
+  "memoryScan": {
+    "enabled": true,
+    "sources": [
+      {
+        "root": "home",
+        "path": [
+          ".claude",
+          "CLAUDE.md"
+        ],
+        "label": "Claude Code global instructions"
+      },
+      {
+        "root": "home",
+        "path": [
+          ".claude",
+          "projects",
+          "*",
+          "memory"
+        ],
+        "suffix": ".md",
+        "label": "Claude Code memory"
+      },
+      {
+        "fromClaudeProjects": [
+          "CLAUDE.md",
+          "AGENTS.md"
+        ],
+        "label": "project instructions"
+      }
+    ],
+    "patterns": [
+      {
+        "type": "jira-project",
+        "regex": "\\b([A-Z][A-Z0-9]{1,9})-\\d+\\b",
+        "group": 1
+      },
+      {
+        "type": "atlassian-site",
+        "regex": "\\b([a-z0-9-]+\\.atlassian\\.net)\\b",
+        "group": 1
+      },
+      {
+        "type": "confluence-page",
+        "regex": "atlassian\\.net/wiki/[^\\s)]*?/pages/(\\d+)",
+        "group": 1
+      },
+      {
+        "type": "github-repo",
+        "regex": "github\\.com/([\\w.-]+/[\\w.-]+?)(?:[/)\\s.]|$)",
+        "group": 1
+      },
+      {
+        "type": "notion-page",
+        "regex": "notion\\.(?:so|com)/[^\\s)]*?([0-9a-fA-F]{32})",
+        "group": 1
+      },
+      {
+        "type": "slack-channel",
+        "regex": "(?:^|\\s)#([a-z0-9][a-z0-9._-]{2,40})\\b",
+        "group": 1
+      }
+    ],
+    "note": "These resources are NAMED in the agent's memory and instruction files. That means the agent has been told about them or has remembered them -- it is not proof that they were accessed; the last column shows which were also seen in the access history. These are matched from prose rather than from tool arguments, so the list is deliberately broad and can include lookalikes (any ABC-123 style identifier reads as a project key)."
+  }
+}

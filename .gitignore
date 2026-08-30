@@ -1,0 +1,8 @@
+# generated reports must never be committed -- unredacted ones contain real resource names
+agentic-access-report-*
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+# internal strategy notes -- kept local, not part of the tool
+RESEARCH-NOTES.md

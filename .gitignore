@@ -6,3 +6,7 @@ __pycache__/
 .DS_Store
 # internal strategy notes -- kept local, not part of the tool
 RESEARCH-NOTES.md
+
+# build artifacts -- binaries ship via GitHub Releases, never in git history
+dist/
+build/.work/

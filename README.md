@@ -7,16 +7,10 @@ It writes one file. You read it. Sharing it is your choice — nothing is sent a
 
 ## Run it
 
-**Option 1 — download the app** (nothing to install):
+You need Node.js 18 or newer (check with `node --version`). Then, from this folder:
 
 ```bash
-./agentic-discovery
-```
-
-**Option 2 — if you have Node 18 or newer:**
-
-```bash
-npx @apono-io/agentic-discovery
+node js/discover.mjs
 ```
 
 It takes a few minutes and prints where it saved the report:
@@ -28,6 +22,10 @@ Open that file in any text editor, or preview it on macOS with:
 ```bash
 open agentic-access-report-*.md
 ```
+
+> **Planned, not available yet:** a downloadable signed app (no Node needed) and
+> `npx @apono-io/agentic-discovery`. Until those ship, running from source as above is the
+> only supported way — which also means you can read exactly what will run.
 
 ## What it looks at
 
@@ -79,4 +77,5 @@ goes somewhere if you send it yourself.
 
 **Will it change anything on my computer?** No. It only reads.
 
-**Do I need to be technical?** No. Run the one command, open the file it creates, read it.
+**Do I need to be technical?** A little, for now — you need Node.js installed and you run one
+command in a terminal. The downloadable app that removes that step is planned.

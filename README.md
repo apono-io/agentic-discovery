@@ -5,13 +5,29 @@ This tool shows what the AI agents on your computer have actually been accessing
 It is **read-only**, makes **no network connections**, and **changes nothing** on your machine.
 It writes one file. You read it. Sharing it is your choice — nothing is sent anywhere.
 
-## Run it
+## Before you start
 
-You need Node.js 18 or newer (check with `node --version`). Then, from this folder:
+You need **Node.js 18 or newer**. Check with:
 
 ```bash
+node --version
+```
+
+No Node? Install it from [nodejs.org](https://nodejs.org) (the "LTS" download), or with a package
+manager — `brew install node` on macOS, `winget install OpenJS.NodeJS` on Windows.
+
+## Run it
+
+Get the files and run one command:
+
+```bash
+git clone https://github.com/apono-io/agentic-discovery.git
+cd agentic-discovery
 node js/discover.mjs
 ```
+
+(No git? Use the green **Code → Download ZIP** button on the repository page, unzip it, and open a
+terminal in that folder.)
 
 It takes a few minutes and prints where it saved the report:
 
@@ -23,9 +39,16 @@ Open that file in any text editor, or preview it on macOS with:
 open agentic-access-report-*.md
 ```
 
-> **Planned, not available yet:** a downloadable signed app (no Node needed) and
-> `npx @apono-io/agentic-discovery`. Until those ship, running from source as above is the
-> only supported way — which also means you can read exactly what will run.
+### Why there is no app to download
+
+Running from source is currently the only supported way, and that is deliberate for now: a
+downloadable executable would have to be signed by us and verified by you, and we would rather ask
+you to run code you can read than teach you to click past your operating system's security
+warnings. Everything that runs is in two files you can read: `js/discover.mjs` (the code) and
+`js/rules.json` (what it looks for). There are no dependencies to install and nothing is fetched
+from the internet.
+
+A signed application and an `npx` package are planned; this README will change when they exist.
 
 ## What it looks at
 

@@ -94,11 +94,12 @@ is not is worse than saying nothing.
 per-user attribution by design.
 
 **Machines are named as their own reports name them.** By default a report masks the person part of
-its hostname but keeps the first and last letter — `N___s-MacBook-Pro` — so you can tell whose
-machine it is without the full name being written down, and a customer can match it to an asset.
-The assessment passes that through unchanged; it never masks a second time. Two caveats: a report
-run with `--no-redact` carries the real hostname, and because masking keeps only two letters, two
-machines can collide on one label — the assessment warns you when that happens.
+its hostname but keeps the first and last letter, plus a short salted code — `n___s~b0f-macbook-pro`
+— so you can tell whose machine it is without the full name being written down, and a customer can
+match it to an asset. The code exists because first-and-last-letter alone collides in roughly 85% of
+fifty-machine fleets; with it, two machines colliding is negligible, and the assessment still warns
+you if it ever happens. The assessment passes labels through unchanged and never masks a second
+time. One caveat: a report run with `--no-redact` carries the real hostname.
 
 **Reports are internal data.** They are gitignored for a reason: even redacted, they describe a
 customer's estate. Keep them out of the repository and out of shared drives that outlive the

@@ -59,11 +59,11 @@ untouched. Do not mask it again: an assessment that hides more than its own inpu
 on and invites the reader to distrust both.
 
 What the scanner does by default: a hostname is usually `<person>-<model>`, so it masks the person
-segment while keeping its first and last letter — `Nufars-MacBook-Pro` becomes
-`N___s-MacBook-Pro`. That is deliberately pseudonymous rather than anonymous. A colleague who knows
-the team can tell whose machine it is, which is the point: an SE needs to ask that person a follow-up
-question, and a customer needs to match a label to an asset. Generic prefixes like `DESKTOP-A1B2C3`
-are left alone, since there is no name in them to hide.
+segment while keeping its first and last letter and appends a short salted code —
+`Nufars-MacBook-Pro` becomes `n___s~b0f-macbook-pro`. That is deliberately pseudonymous rather than
+anonymous. A colleague who knows the team can tell whose machine it is, which is the point: an SE
+needs to ask that person a follow-up question, and a customer needs to match a label to an asset.
+Generic prefixes like `DESKTOP-A1B2C3` are left alone, since there is no name in them to hide.
 
 Two things to look at:
 
@@ -71,9 +71,9 @@ Two things to look at:
 legitimate choice for reading your own report. Before putting it in a shared artifact, check the
 person whose machine it is is comfortable with that — you are the one publishing it.
 
-**Colliding labels.** Masking keeps only the first and last letter, so two machines can land on the
-same label and get merged into one row. The assessment flags this when it happens; distinguish them
-before quoting machine counts.
+**Colliding labels.** The salted code makes this unlikely, but the assessment still checks: if two
+reports claim the same label their rows are merged as one machine, and you are told. Distinguish
+them before quoting machine counts.
 
 ## Step 4 — build the artifact
 

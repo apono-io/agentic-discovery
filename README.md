@@ -20,13 +20,14 @@ npx github:apono-io/agentic-discovery
 It takes a few minutes, tells you the label your machine is reported under, and prints where it
 saved the report:
 
-    This machine is reported as: N___s-MacBook-Pro
-    agentic-access-report-N___s-MacBook-Pro-<date>.md
+    This machine is reported as: n___s~b0f-macbook-pro
+    agentic-access-report-n___s~b0f-macbook-pro-<date>.md
 
 Computer names usually contain a person's name, so the report masks that part while keeping enough
-to recognise the machine — `Nufars-MacBook-Pro` becomes `N___s-MacBook-Pro`. Your full name is not
-in the filename, the report, or anything built from it. If you would rather share the real name,
-run with `--no-redact`.
+to recognise the machine — `Nufars-MacBook-Pro` becomes `n___s~b0f-macbook-pro`. Your full name is
+not in the filename, the report, or anything built from it. (The short code after the `~` just keeps
+two similarly-named computers from being mistaken for each other.) If you would rather share the
+real name, run with `--no-redact`.
 
 Open that file in any text editor, or preview it on macOS with:
 

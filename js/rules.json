@@ -1058,7 +1058,7 @@
     },
     "machineLabel": {
       "mask": "___",
-      "note": "A hostname is usually <person>-<model>. The person segment is masked but keeps its first and last letter, so a label like n___s-MacBook-Pro stays recognisable to someone who knows the team while the name itself is not written down. The mask is fixed-width so the name's length is not disclosed either. This is pseudonymous rather than anonymous, and deliberately so: an unreadable label is not one anybody can act on.",
+      "note": "A hostname is usually <person>-<model>. The person segment is masked but keeps its first and last letter, and a short salted tag from the full hostname is appended, giving labels like n___s~b0f-macbook-pro. The readable part lets someone who knows the team recognise the machine; the tag makes collisions negligible, since first letter plus last letter alone collides for roughly 85% of fifty-machine fleets. Labels are lower-cased so one machine cannot produce two spellings, and the mask is fixed-width so the name's length is not disclosed. This is pseudonymous rather than anonymous, deliberately: an unreadable label is not one anybody can act on.",
       "genericPrefixes": [
         "desktop",
         "laptop",
@@ -1071,7 +1071,8 @@
         "host",
         "vm",
         "ubuntu"
-      ]
+      ],
+      "tagLength": 3
     }
   },
   "connectorFingerprints": [

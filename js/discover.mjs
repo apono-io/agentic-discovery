@@ -667,24 +667,35 @@ const saltFingerprint = () => crypto.createHash("sha256")
   .slice(0, (RD.saltFingerprint && RD.saltFingerprint.length) || 8);
 /* A hostname is usually "<person>-<model>", so the person's name sits in the first segment.
    Masking that segment while keeping its first and last letter leaves a label a colleague can
-   recognise at a glance -- n___s-MacBook-Pro -- without writing the name down. The mask is a fixed
-   width so it does not also disclose how long the name is. Pseudonymous, not anonymous: with a
-   small team, first letter plus last letter narrows it down, which is the trade being made for a
-   label people can actually use. --no-redact keeps the hostname as it is. */
+   recognise at a glance -- n___s~b0f-macbook-pro -- without the name being written down.
+
+   The short tag is not decoration. First letter plus last letter gives 676 combinations, so by the
+   birthday bound two machines out of fifty collide about 85% of the time; the tag, hashed from the
+   full hostname and the shared salt, makes a genuine collision negligible while leaving the
+   readable part untouched. It is deterministic, so a machine keeps its label across re-runs and
+   across the reports being merged, and salted, so labels cannot be matched between engagements.
+
+   The label is lower-cased so the same machine cannot produce two spellings, and the mask is a
+   fixed width so the name's length is not disclosed either.
+
+   Pseudonymous, not anonymous: with a small team, first letter plus last letter plus model narrows
+   it to a person. That is the trade for a label people can act on. --no-redact keeps the hostname. */
 function machineLabel() {
   const host = os.hostname().split(".")[0];
   if (!REDACT) return host;
-  const mask = (RD.machineLabel && RD.machineLabel.mask) || "___";
+  const cfg = RD.machineLabel || {};
+  const mask = cfg.mask || "___";
   const i = host.indexOf("-");
   const person = i === -1 ? host : host.slice(0, i);
-  const rest = i === -1 ? "" : host.slice(i);
+  const rest = (i === -1 ? "" : host.slice(i)).toLowerCase();
   // DESKTOP-A1B2C3 and the like carry no name -- masking them hides nothing and costs legibility.
-  const generic = (RD.machineLabel && RD.machineLabel.genericPrefixes) || [];
-  if (generic.includes(person.toLowerCase())) return host;
-  const masked = person.length >= 3
-    ? person[0] + mask + person[person.length - 1]
-    : mask;                       // too short to reveal anything safely
-  return masked + rest;
+  if ((cfg.genericPrefixes || []).includes(person.toLowerCase())) return host.toLowerCase();
+  const p = person.toLowerCase();
+  const masked = p.length >= 3 ? p[0] + mask + p[p.length - 1] : mask;
+  const tag = crypto.createHash("sha256")
+    .update(`agentic-discovery/machine\u0000${SALT}\u0000${host.toLowerCase()}`)
+    .digest("hex").slice(0, cfg.tagLength || 3);
+  return `${masked}~${tag}${rest}`;
 }
 function redactRid(rid) {
   if (!REDACT) return rid;

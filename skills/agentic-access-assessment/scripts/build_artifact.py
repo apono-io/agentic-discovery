@@ -118,6 +118,7 @@ section{margin-top:44px}
 .tile .k{display:block; margin-top:8px; font-size:12.5px; color:var(--muted); line-height:1.35}
 .tile.sev .n{color:var(--critical)}
 .tile.alt .n{color:var(--accent)}
+.tile.warnt .n{color:var(--warn)}
 
 /* controls */
 .controls{
@@ -348,12 +349,13 @@ const TILES = [
   ["mcpOnly", "types reached only through MCP servers", 0],
   ["mixedTypes", "types reached both ways \u2014 a brokered path exists and is bypassed", 2],
   ["privileged", "resources with privileged access, beyond read", 2],
+  ["identified", "of agent actions could be tied to a named resource", 3],
   ["shadow", "servers used but never configured", 0],
   ["idle", "servers configured but never used", 0],
 ];
 const tiles = document.getElementById("tiles");
 for (const [k, label, sev] of TILES) {
-  const t = el("div", "tile" + (sev === 1 ? " sev" : sev === 2 ? " alt" : ""));
+  const t = el("div", "tile" + (sev === 1 ? " sev" : sev === 2 ? " alt" : sev === 3 ? " warnt" : ""));
   t.appendChild(el("span", "n", String(S[k])));
   t.appendChild(el("span", "k", label));
   tiles.appendChild(t);
@@ -555,7 +557,10 @@ for t in types:
 intent_totals = {c: sum(1 for r in res if c in r["categories"]) for c in INTENTS}
 privileged = [r for r in res if any(c in r["categories"] for c in INTENTS[1:])]
 
+_id = data.get("identification") or {}
 summary = {
+    "identified": (f"{round(100 * _id['resolved'] / _id['external'])}%"
+                   if _id.get("external") else "n/a"),
     "intents": intent_totals, "privileged": len(privileged),
     "cliOnly": len(cli_only), "mcpOnly": len(mcp_only), "mixedTypes": len(mixed_types),
     "mixedResources": len(mixed_res),
@@ -589,6 +594,15 @@ limits.append("**Machines are named as their own reports name them.** Where a re
               "redaction on, the hostname's person segment is masked but keeps its first and last "
               "letter, so a colleague can recognise the machine without the full name being written "
               "down. Nothing is masked a second time here.")
+ident = data.get("identification")
+if ident and ident.get("external"):
+    pct = round(100 * ident["resolved"] / ident["external"])
+    limits.insert(1, f"**{ident['resolved']} of {ident['external']} externally-reaching actions "
+                     f"({pct}%) could be tied to a named resource.** The other "
+                     f"{ident['external'] - ident['resolved']} reached something real that the scan "
+                     "could not name, almost always an MCP server whose arguments we have no "
+                     "extraction rule for yet. Every count on this page therefore understates the "
+                     "estate rather than overstating it.")
 limits.append(f"**Coverage labels go stale.** {data['catalogNote']}")
 
 payload = {

@@ -52,6 +52,18 @@ customer something is supported when it is not is worse than telling them nothin
 **Redaction.** Reports should say "Resource names are redacted". If one was run with
 `--no-redact`, it contains real resource names — do not put that in an artifact without asking.
 
+**The identification rate, per machine and fleet-wide.** Each report states how many of its
+externally-reaching actions could be tied to a named resource. The assessment aggregates it, and it
+belongs in the conversation because it is the one number that tells the reader which direction the
+others are wrong in: an unnamed action reached something real, so every count understates the estate.
+
+Look at the spread, not just the total. A machine at 99% and a machine at 13% are telling you
+different things, and a machine reporting **zero resources needs its rate checked before you call it
+clean**: zero resources with no MCP servers used is genuinely no external access, while zero
+resources out of thirty-six external actions is a measurement gap wearing the same clothes. When the
+rate is low, the servers with the highest call counts on that machine name the extraction rules
+worth adding.
+
 ## Step 3 — machine identity is decided at scan time, not here
 
 Each report names its own machine, and that name flows through the merge and into the artifact

@@ -71,6 +71,10 @@ function parseMd(md, file) {
     version: (/agentic-discovery v([\d.]+)/.exec(md) || [, "?"])[1],
     saltBasis: (/Resource names are redacted \(([^)\u00b7]+)/.exec(md) || [, "not redacted"])[1].trim(),
     fingerprint: (/salt fingerprint ([0-9a-f]+)/.exec(md) || [, ""])[1],
+    idRate: (() => {                       // how much of this machine's external access we could name
+      const m = /identification rate: (\d+)\/(\d+)/.exec(md);
+      return m ? { resolved: +m[1], external: +m[2] } : null;
+    })(),
     agents: [], mcp: [], resources: [], memory: [],
   };
   const T = (h2, h3 = "") => (tables[h2] && tables[h2][h3]) || { rows: [] };
@@ -99,6 +103,7 @@ function parseJson(j, file) {
                 machine: file.replace(/^.*agentic-access-report-(.+)-\d{8}\.json$/, "$1"),
                 generated: ["?", j.platform || "?"], version: j.version || "?",
                 saltBasis: j.redacted ? "redacted" : "not redacted", fingerprint: j.saltFingerprint || "",
+                idRate: null,
                 agents: [], mcp: [], resources: [], memory: [] };
   for (const [agent, a] of Object.entries(j.agents || {}))
     rep.agents.push({ agent, present: !!a.installed,
@@ -315,6 +320,19 @@ function render(reports, merged, opts) {
         `keeps only the first and last letter of the name, so different machines can land on the ` +
         `same one; their rows are merged above as though they were one machine. Re-run those with ` +
         `\`--no-redact\` or distinguish them by hand before relying on the machine counts.`);
+  const rated = reports.filter((r) => r.idRate);
+  if (rated.length) {
+    const resolved = rated.reduce((n, r) => n + r.idRate.resolved, 0);
+    const external = rated.reduce((n, r) => n + r.idRate.external, 0);
+    const pct = Math.round((100 * resolved) / Math.max(external, 1));
+    const worst = [...rated].sort((a, b) =>
+      (b.idRate.external - b.idRate.resolved) - (a.idRate.external - a.idRate.resolved))[0];
+    add(`- **${resolved} of ${external} externally-reaching actions (${pct}%) could be tied to a ` +
+        `named resource.** The other ${external - resolved} reached something real that this scan ` +
+        `could not name -- usually an MCP server whose arguments we have no extraction rule for. ` +
+        `Everything above therefore understates the estate rather than overstating it. The largest ` +
+        `single gap is ${worst.machine} at ${worst.idRate.resolved}/${worst.idRate.external}.`);
+  }
   const totalDropped = reports.flatMap((r) => r.dropped).reduce((n, d) => n + d.count, 0);
   if (totalDropped)
     add(`- **${totalDropped} row(s) were truncated out of the source reports** and are missing here. ` +
@@ -392,7 +410,14 @@ function main() {
     const j = {
       generated: new Date().toISOString().slice(0, 10),
       customer: customer || null,
+      identification: (() => {
+        const rated = reports.filter((r) => r.idRate);
+        if (!rated.length) return null;
+        return { resolved: rated.reduce((n, r) => n + r.idRate.resolved, 0),
+                 external: rated.reduce((n, r) => n + r.idRate.external, 0) };
+      })(),
       machines: reports.map((r) => ({ machine: r.machine, generated: r.generated[0],
+                                      idRate: r.idRate,
                                       version: r.version, saltBasis: r.saltBasis,
                                       fingerprint: r.fingerprint || null, source: r.source,
                                       resources: r.resources.length,

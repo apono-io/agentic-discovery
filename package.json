@@ -4,12 +4,15 @@
   "description": "Read-only, no-network scan of local AI-agent usage; produces a human-readable, redacted-by-default access report.",
   "type": "module",
   "bin": {
-    "agentic-discovery": "js/discover.mjs"
+    "agentic-discovery": "js/discover.mjs",
+    "agentic-discovery-merge": "js/merge.mjs"
   },
   "files": [
     "js/discover.mjs",
+    "js/merge.mjs",
     "js/rules.json",
     "README.md",
+    "MERGING.md",
     "SECURITY-AUDIT.md"
   ],
   "engines": {

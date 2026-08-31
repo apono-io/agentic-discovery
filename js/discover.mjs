@@ -836,7 +836,7 @@ async function main() {
   const base = path.join(outDir, `agentic-access-report-${os.hostname().split(".")[0]}-${stamp}`);
   writeReport(base + ".md", buildReport());
   console.log(`\nReport written to: ${base}.md`);
-  if (argv.includes("--json")) {
+  if (!argv.includes("--no-json")) {
     const clean = (v) => (v instanceof Set ? [...v].sort() : v);
     const obj = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, clean(v)]));
     const j = { version: VERSION, platform: platformLine(),
@@ -849,7 +849,7 @@ async function main() {
                                                  group: resGroup(r.rtype),
                                                  reported: isReported(r.rtype) })) };
     writeReport(base + ".json", JSON.stringify(j, null, 1));
-    console.log(`Machine-readable copy:  ${base}.json`);
+    console.log(`Machine-readable copy:  ${base}.json  (send both files if asked to share)`);
   }
   console.log("Review the report, then share it manually if you choose to. Nothing was sent anywhere.");
 }

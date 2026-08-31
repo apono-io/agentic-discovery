@@ -17,9 +17,11 @@ Then one command — nothing to clone, nothing left installed:
 npx github:apono-io/agentic-discovery
 ```
 
-It takes a few minutes and prints where it saved the report:
+It takes a few minutes and prints where it saved the report — two files, a readable one and a
+machine-readable copy of the same information:
 
-    agentic-access-report-<your-computer>-<date>.md
+    agentic-access-report-<your-computer>-<date>.md     <- read this one
+    agentic-access-report-<your-computer>-<date>.json   <- send this one too, if asked
 
 Open that file in any text editor, or preview it on macOS with:
 

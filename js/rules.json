@@ -1154,5 +1154,48 @@
       }
     ],
     "note": "These resources are NAMED in the agent's memory and instruction files. That means the agent has been told about them or has remembered them -- it is not proof that they were accessed; the last column shows which were also seen in the access history. These are matched from prose rather than from tool arguments, so the list is deliberately broad and can include lookalikes (any ABC-123 style identifier reads as a project key)."
+  },
+  "aponoCatalog": {
+    "supported": [
+      "aws",
+      "postgres",
+      "mysql",
+      "db-database",
+      "db-schema",
+      "db-table",
+      "atlassian-site",
+      "jira-project",
+      "confluence-page",
+      "confluence-space",
+      "github-repo",
+      "github-org",
+      "monday-board",
+      "knowledge-collection",
+      "mixpanel",
+      "okta"
+    ],
+    "roadmap": [
+      "k8s",
+      "snowflake",
+      "db-warehouse"
+    ],
+    "unsupported": [
+      "azure",
+      "gcp",
+      "oci",
+      "notion",
+      "notion-page",
+      "notion-database",
+      "slack-channel",
+      "git-remote",
+      "web-domain"
+    ],
+    "labels": {
+      "supported": "supported today",
+      "roadmap": "on roadmap",
+      "unsupported": "not supported",
+      "unknown": "needs review"
+    },
+    "note": "Catalog status reflects the APG supported-target tiers as of 2026-07-14 and is a PRODUCT FACT THAT CHANGES -- re-check it against the current integration catalog before putting an assessment in front of a customer."
   }
 }

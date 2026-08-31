@@ -10,3 +10,5 @@ RESEARCH-NOTES.md
 # build artifacts -- binaries ship via GitHub Releases, never in git history
 dist/
 build/.work/
+agentic-access-assessment-*
+Reports/

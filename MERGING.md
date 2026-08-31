@@ -52,9 +52,13 @@ integration an admin would actually onboard, with how many machines touched it, 
 happened, and total call volume. The order is your recommended onboarding order: supported first,
 sorted by volume.
 
-**The `not supported` and `on roadmap` sections.** Show these to the customer rather than hiding
-them — they set expectations, and they are the most honest roadmap input we get. But know them
-before the meeting.
+**The coverage tiers.** Resources fall into four buckets: *supported today* (native integration),
+*supported via custom OAuth MCP* (reachable through Apono's custom OAuth MCP support — covers most
+OAuth MCP servers, whether unauthenticated, using dynamic client registration, or client-ID auth),
+*on roadmap*, and *not supported*. The first two are both sellable today; the difference is how the
+integration gets stood up, which is worth being precise about in the meeting. Show the last two to
+the customer rather than hiding them — they set expectations, and they are the most honest roadmap
+input we get.
 
 **The salt fingerprint column in the machines table.** Every report header carries a short hash of
 the salt that produced its redaction tags. Reports can only be consolidated when those match — the

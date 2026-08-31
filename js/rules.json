@@ -1163,11 +1163,17 @@
   "aponoCatalog": {
     "supported": [
       "aws",
+      "k8s",
       "postgres",
       "mysql",
+      "mongodb",
+      "snowflake",
+      "databricks",
       "db-database",
       "db-schema",
       "db-table",
+      "db-warehouse",
+      "db-collection",
       "atlassian-site",
       "jira-project",
       "confluence-page",
@@ -1175,32 +1181,32 @@
       "github-repo",
       "github-org",
       "monday-board",
-      "knowledge-collection",
       "mixpanel",
-      "okta"
+      "okta",
+      "knowledge-collection"
     ],
-    "roadmap": [
-      "k8s",
-      "snowflake",
-      "db-warehouse"
-    ],
-    "unsupported": [
-      "azure",
-      "gcp",
-      "oci",
+    "oauthMcp": [
       "notion",
       "notion-page",
       "notion-database",
-      "slack-channel",
+      "slack-channel"
+    ],
+    "roadmap": [
+      "azure"
+    ],
+    "unsupported": [
+      "gcp",
+      "oci",
       "git-remote",
       "web-domain"
     ],
     "labels": {
       "supported": "supported today",
+      "oauthMcp": "supported via custom OAuth MCP",
       "roadmap": "on roadmap",
       "unsupported": "not supported",
       "unknown": "needs review"
     },
-    "note": "Catalog status reflects the APG supported-target tiers as of 2026-07-14 and is a PRODUCT FACT THAT CHANGES -- re-check it against the current integration catalog before putting an assessment in front of a customer."
+    "note": "Catalog status as of 2026-08-31: AWS and Kubernetes GA; PostgreSQL, MySQL, MongoDB, Snowflake and Databricks GA; native Atlassian, GitHub, monday.com, Mixpanel and Okta integrations. Anything marked 'supported via custom OAuth MCP' is reachable through Apono's custom OAuth MCP support, which covers most OAuth MCP servers (unauthenticated, dynamic client registration, and client-ID authentication). This is a PRODUCT FACT THAT CHANGES -- re-check it against the current integration catalog before putting an assessment in front of a customer."
   }
 }

@@ -57,7 +57,10 @@ function parseTables(md) {
   return { tables: out, dropped };
 }
 const clean = (s) => String(s || "").replace(/^`|`$/g, "").replace(/\*\*/g, "").trim();
-const splitList = (s) => clean(s).split(/[;,]/).map((x) => x.trim()).filter((x) => x && x !== "-");
+/* Per-machine reports cap long tool lists with a "+N more" tail. That tail is a display
+   artifact, not a tool -- carrying it through would show "+19 more" as if it were a tool name. */
+const splitList = (s) => clean(s).split(/[;,]/).map((x) => x.trim())
+  .filter((x) => x && x !== "-" && !/^\+\d+( more)?$/.test(x));
 
 function parseMd(md, file) {
   const { tables, dropped } = parseTables(md);
@@ -374,6 +377,49 @@ function main() {
   }
   if (!reports.length) { console.error("Nothing could be parsed."); process.exit(1); }
   const merged = mergeReports(reports);
+  if (argv.includes("--json")) {
+    const set = (v) => [...v].sort();
+    const j = {
+      generated: new Date().toISOString().slice(0, 10),
+      customer: customer || null,
+      machines: reports.map((r) => ({ machine: r.machine, generated: r.generated[0],
+                                      version: r.version, saltBasis: r.saltBasis,
+                                      fingerprint: r.fingerprint || null, source: r.source,
+                                      resources: r.resources.length,
+                                      truncatedRows: r.dropped.reduce((n, d) => n + d.count, 0) })),
+      resourceTypes: [...merged.res.values()].reduce((acc, r) => {
+        const t = acc[r.rtype] || (acc[r.rtype] = { type: r.rtype, coverage: catalogStatus(r.rtype),
+          coverageLabel: catalogLabel(catalogStatus(r.rtype)), resources: 0, calls: 0,
+          writes: 0, machines: new Set(), tools: new Set() });
+        t.resources++; t.calls += r.calls; if (hasWrite(r.cats)) t.writes++;
+        r.machines.forEach((m) => t.machines.add(m)); r.tools.forEach((x) => t.tools.add(x));
+        return acc;
+      }, {}),
+      resources: [...merged.res.values()].map((r) => ({ id: r.rid, type: r.rtype, group: r.group,
+        coverage: catalogStatus(r.rtype), access: r.cats.has("admin") ? "admin"
+          : r.cats.has("delete") ? "delete" : hasWrite(r.cats) ? "write" : "read",
+        categories: set(r.cats), tools: set(r.tools), machines: set(r.machines),
+        machineCount: r.machines.size, calls: r.calls, lastSeen: r.last })),
+      mcpServers: [...merged.mcp.values()].map((m) => ({ server: m.server, calls: m.calls,
+        usedOn: m.usedOn.size, configuredOn: m.configuredOn.size,
+        shadow: m.usedOn.size > 0 && m.configuredOn.size === 0,
+        idle: m.usedOn.size === 0 && m.configuredOn.size > 0,
+        agents: set(m.agents), lastUsed: m.last })),
+      memoryReferences: [...merged.mem.values()].map((m) => ({ id: m.rid, type: m.rtype,
+        mentions: m.mentions, machines: m.machines.size,
+        alsoAccessed: merged.res.has(`${m.rtype}\u0000${m.rid}`) })),
+      catalogNote: CAT.note,
+    };
+    for (const t of Object.values(j.resourceTypes)) {
+      t.machines = t.machines.size; t.tools = t.tools.size;
+    }
+    j.resourceTypes = Object.values(j.resourceTypes)
+      .sort((a, b) => b.calls - a.calls);
+    const jp = path.join(outDir, `agentic-access-assessment-${j.generated}.json`);
+    try { if (fs.lstatSync(jp)) fs.rmSync(jp); } catch { /* absent */ }
+    fs.writeFileSync(jp, JSON.stringify(j, null, 1), { encoding: "utf-8", flag: "wx" });
+    console.log(`  structured data:  ${jp}`);
+  }
   const out = path.join(outDir, `agentic-access-assessment-${new Date().toISOString().slice(0, 10)}.md`);
   const body = render(reports, merged, { customer });
   try { if (fs.lstatSync(out)) fs.rmSync(out); } catch { /* absent */ }

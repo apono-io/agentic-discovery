@@ -69,6 +69,14 @@ you see that warning, stop and fix the inputs rather than shipping the document.
 **The limitations section at the bottom.** It states truncated rows, mixed redaction settings, and
 the catalog caveat. Read it, because a customer will.
 
+## Want the visual version?
+
+Ask Claude Code: *"build the access assessment for Acme from the reports in ./Reports"*. The
+`agentic-access-assessment` skill (in `skills/`) runs the merge, performs the honesty checks in this
+document, anonymises machine names, and publishes an interactive page where you can filter by access
+type and coverage tier and expand any resource type to see the individual resources behind it.
+Install it by copying `skills/agentic-access-assessment/` into `~/.claude/skills/`.
+
 ## Things that will bite you
 
 **Mixed salts cannot be merged.** If one participant ran with an explicit `--salt` and another did

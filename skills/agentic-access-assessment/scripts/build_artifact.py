@@ -13,6 +13,14 @@ machines = data["machines"]
 # owner -- masking it again downstream would only make the assessment harder to act on than its
 # own inputs are.
 
+# Access path per type: CLI means the agent reached it without going through any MCP server.
+paths_by_type = {}
+for r in res:
+    kinds = {t.split(":")[0] for t in r["tools"]}
+    paths_by_type.setdefault(r["type"], set()).update(kinds)
+for t in types:
+    t["paths"] = sorted(paths_by_type.get(t["type"], set()))
+
 n_types = len(types)
 n_res = len(res)
 write_types = sum(1 for t in types if t["writes"])
@@ -92,6 +100,7 @@ section{margin-top:44px}
 }
 .tile .k{display:block; margin-top:8px; font-size:12.5px; color:var(--muted); line-height:1.35}
 .tile.sev .n{color:var(--critical)}
+.tile.alt .n{color:var(--accent)}
 
 /* controls */
 .controls{
@@ -283,11 +292,16 @@ h.appendChild(document.createTextNode(", and " + S.covered + " of those are with
 document.getElementById("lede").textContent =
   S.resources + " individual resources across " + S.machines + " machines. " +
   S.writeTypes + " of the " + S.types + " types saw changes rather than reads alone" +
-  (S.admin || S.delete ? " \\u2014 including " + S.admin + " with admin actions and " + S.delete + " with deletes." : ".");
+  (S.admin || S.delete ? " \\u2014 including " + S.admin + " with admin actions and " + S.delete + " with deletes." : ".") +
+  " " + S.cliTypes + " of the " + S.types + " types were reached by a command-line tool with no MCP " +
+  "server anywhere in the path (" + S.cliResources + " resources, " + S.cliCalls + " calls), which is " +
+  "access no MCP-level tooling can see.";
 
 const TILES = [
   ["types", "resource types reached", 0],
   ["resources", "individual resources", 0],
+  ["cliTypes", "types reached by direct CLI, no MCP server in the path", 2],
+  ["mcpTypes", "types reached through an MCP server", 0],
   ["writeTypes", "types with changes", 0],
   ["severe", "resources with admin or delete", 1],
   ["shadow", "servers used but never configured", 0],
@@ -295,7 +309,7 @@ const TILES = [
 ];
 const tiles = document.getElementById("tiles");
 for (const [k, label, sev] of TILES) {
-  const t = el("div", "tile" + (sev ? " sev" : ""));
+  const t = el("div", "tile" + (sev === 1 ? " sev" : sev === 2 ? " alt" : ""));
   t.appendChild(el("span", "n", String(S[k])));
   t.appendChild(el("span", "k", label));
   tiles.appendChild(t);
@@ -466,7 +480,13 @@ document.getElementById("foot").textContent = D.footer;
 </script>
 """
 
+cli_types = [t for t in types if "CLI" in t.get("paths", [])]
+mcp_types = [t for t in types if "MCP" in t.get("paths", [])]
+cli_res = [r for r in res if any(t.startswith("CLI:") for t in r["tools"])]
+
 summary = {
+    "cliTypes": len(cli_types), "mcpTypes": len(mcp_types),
+    "cliResources": len(cli_res), "cliCalls": sum(t["calls"] for t in cli_types),
     "machines": len(machines), "types": n_types, "resources": n_res,
     "writeTypes": write_types, "covered": covered,
     "admin": admin_n, "delete": delete_n, "severe": admin_n + delete_n,
@@ -496,14 +516,6 @@ limits.append("**Machines are named as their own reports name them.** Where a re
               "letter, so a colleague can recognise the machine without the full name being written "
               "down. Nothing is masked a second time here.")
 limits.append(f"**Coverage labels go stale.** {data['catalogNote']}")
-
-# Access path per type: CLI means the agent reached it without going through any MCP server.
-paths_by_type = {}
-for r in res:
-    kinds = {t.split(":")[0] for t in r["tools"]}
-    paths_by_type.setdefault(r["type"], set()).update(kinds)
-for t in types:
-    t["paths"] = sorted(paths_by_type.get(t["type"], set()))
 
 payload = {
     "customer": data.get("customer"), "generated": data["generated"],

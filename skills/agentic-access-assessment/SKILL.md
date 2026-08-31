@@ -103,6 +103,11 @@ The page is structured around the type view, in this order:
    across Y types; Z types saw writes; W are within Apono's coverage today. One sentence someone
    can repeat in a meeting.
 
+   Include the CLI/MCP split here and in the summary tiles, not only in the table: how many types
+   were reached by a command-line tool with no MCP server in the path. It is the number that decides
+   whether the customer's existing MCP-level controls see anything at all, so it belongs where
+   somebody who reads two lines will see it.
+
 2. **Resource types as the primary table** — one row per type, sorted by call volume, each showing:
    coverage tier, how many distinct resources, how many machines, whether writes happened, total
    calls, and the **access path** (CLI, MCP, or both). This is the table the SE reads first and the

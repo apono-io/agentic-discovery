@@ -1,0 +1,24 @@
+{
+  "name": "@apono-io/agentic-discovery",
+  "version": "0.7.0",
+  "description": "Read-only, no-network scan of local AI-agent usage; produces a human-readable, redacted-by-default access report.",
+  "type": "module",
+  "bin": {
+    "agentic-discovery": "js/discover.mjs"
+  },
+  "files": [
+    "js/discover.mjs",
+    "js/rules.json",
+    "README.md",
+    "SECURITY-AUDIT.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apono-io/agentic-discovery.git"
+  },
+  "license": "MIT",
+  "private": true
+}

@@ -94,21 +94,29 @@ The page is structured around the type view, in this order:
    can repeat in a meeting.
 
 2. **Resource types as the primary table** — one row per type, sorted by call volume, each showing:
-   coverage tier (as a colour-coded badge), how many distinct resources, how many machines, whether
-   writes happened, total calls, and how many distinct tools were used to reach it. This is the
-   table the SE reads first and the customer argues about.
+   coverage tier, how many distinct resources, how many machines, whether writes happened, total
+   calls, and the **access path** (CLI, MCP, or both). This is the table the SE reads first and the
+   customer argues about.
+
+   The access path belongs at this level rather than one click down. A type reached by raw CLI never
+   passed through an MCP server, so it is invisible to any MCP-level tooling and it is usually the
+   most interesting thing on the page — in our own pilot every cloud and database type was CLI-only
+   while every SaaS type went through MCP. If that only shows up after expanding a row, the reader
+   will miss it.
 
 3. **Drill-down per type.** Clicking a type row expands to its individual resources with their
    redacted id, access level, machines, tools and last-seen date. Keep it inside the page — no
    navigation away, no second file. The SE will be asked "which ones?" live in a meeting.
 
-4. **Filters that answer real questions**: writes only, admin/delete only, by coverage tier, and a
-   text search. Each one corresponds to a question someone actually asks ("what can they change?",
-   "what can't you govern yet?").
+4. **Filters that answer real questions**: writes only, admin/delete only, direct CLI, by coverage
+   tier, and a text search. Each corresponds to a question someone actually asks — "what can they
+   change?", "what did they reach without any MCP server in the path?", "what can't you govern yet?".
 
 5. **MCP servers**, split into *used but in no config file* (connectors and plugins — the shadow
    surface) and *configured but never used* (unnecessary standing capability). Both halves are
-   findings; label them so it is obvious which is which.
+   findings; label them so it is obvious which is which. Show **machines and calls** for each: one
+   server on six machines is an organisation-wide pattern, the same call count on one machine is one
+   person's experiment, and those need different responses.
 
 6. **Limitations, visible rather than buried** — truncated rows, fingerprint status, the catalog
    date. A customer will read this section, and its presence is what makes the rest credible.

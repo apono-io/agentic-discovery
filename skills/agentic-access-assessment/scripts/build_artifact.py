@@ -137,6 +137,12 @@ tr.open .caret{transform:rotate(90deg)}
 .cov-oauthMcp{background:var(--accent-soft); color:var(--accent); border-color:var(--accent-line)}
 .cov-roadmap{background:var(--warn-soft); color:var(--warn); border-color:color-mix(in srgb,var(--warn) 34%,transparent)}
 .cov-unsupported,.cov-unknown{background:var(--critical-soft); color:var(--critical); border-color:color-mix(in srgb,var(--critical) 34%,transparent)}
+.path{
+  display:inline-block; font:500 11px/1 "IBM Plex Mono",monospace; letter-spacing:.04em;
+  padding:4px 7px; border-radius:4px; margin-right:5px; white-space:nowrap;
+}
+.path-cli{color:var(--accent); background:var(--accent-soft); border:1px solid var(--accent-line)}
+.path-mcp{color:var(--muted); background:var(--surface-2); border:1px solid var(--line)}
 .acc{font:500 12px/1 "IBM Plex Mono",monospace; padding:4px 7px; border-radius:4px; white-space:nowrap}
 .acc-read{color:var(--muted); background:var(--surface-2)}
 .acc-write{color:var(--accent); background:var(--accent-soft)}
@@ -197,6 +203,7 @@ footer{margin-top:44px; padding-top:20px; border-top:1px solid var(--line); colo
         <button class="chip" data-acc="all" aria-pressed="true">All access</button>
         <button class="chip" data-acc="write" aria-pressed="false">Changes only</button>
         <button class="chip" data-acc="sev" aria-pressed="false">Admin &amp; delete</button>
+        <button class="chip" data-acc="cli" aria-pressed="false">Direct CLI</button>
       </div>
       <select id="cov" aria-label="Filter by Apono coverage"></select>
       <input type="search" id="q" placeholder="Search type, resource or tool" aria-label="Search">
@@ -206,7 +213,7 @@ footer{margin-top:44px; padding-top:20px; border-top:1px solid var(--line); colo
         <thead><tr>
           <th>Resource type</th><th>Apono coverage</th>
           <th class="num">Resources</th><th class="num">Machines</th>
-          <th class="num">With changes</th><th class="num">Calls</th><th class="num">Tools</th>
+          <th class="num">With changes</th><th class="num">Calls</th><th>Access path</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -307,6 +314,7 @@ let state = { acc: "all", cov: "all", q: "" };
 function matchesRes(r) {
   if (state.acc === "write" && r.access === "read") return false;
   if (state.acc === "sev" && !["admin", "delete"].includes(r.access)) return false;
+  if (state.acc === "cli" && !r.tools.some((t) => t.startsWith("CLI:"))) return false;
   if (state.q) {
     const hay = (r.id + " " + r.type + " " + r.tools.join(" ") + " " + r.machines.join(" ")).toLowerCase();
     if (!hay.includes(state.q)) return false;
@@ -337,8 +345,15 @@ function render() {
     const c1 = el("td");
     c1.appendChild(el("span", "badge cov-" + t.coverage, covLabel[t.coverage] || t.coverage));
     tr.appendChild(c1);
-    for (const v of [kids.length, t.machines, kids.filter((k) => k.access !== "read").length, t.calls, t.tools])
+    for (const v of [kids.length, t.machines, kids.filter((k) => k.access !== "read").length, t.calls])
       tr.appendChild(el("td", "num", String(v)));
+    const pt = el("td");
+    for (const p of t.paths || []) {
+      const cls = p === "CLI" ? "path path-cli" : "path path-mcp";
+      pt.appendChild(el("span", cls, p === "Built-in" ? "built-in" : p.toLowerCase()));
+    }
+    pt.title = t.tools + " distinct tools";
+    tr.appendChild(pt);
     tbody.appendChild(tr);
 
     const det = el("tr", "detail");
@@ -410,7 +425,10 @@ function fillServers(hId, lId, list, heading) {
   const ul = document.getElementById(lId);
   for (const m of list.sort((a, b) => b.calls - a.calls)) {
     const li = el("li", null, m.server + " ");
-    li.appendChild(el("span", null, m.calls ? m.calls + " calls" : "unused"));
+    const machines = m.usedOn || m.configuredOn;
+    li.appendChild(el("span", null,
+      machines + (machines === 1 ? " machine" : " machines")
+      + (m.calls ? "  \u00b7  " + m.calls + (m.calls === 1 ? " call" : " calls") : "  \u00b7  unused")));
     ul.appendChild(li);
   }
 }
@@ -471,6 +489,14 @@ limits.append("**Resource names are redacted.** Types, access levels, tools, mac
 limits.append("**Machine names are replaced with neutral labels.** Hostnames usually contain "
               "employees' names, and this assessment reports at machine level by design.")
 limits.append(f"**Coverage labels go stale.** {data['catalogNote']}")
+
+# Access path per type: CLI means the agent reached it without going through any MCP server.
+paths_by_type = {}
+for r in res:
+    kinds = {t.split(":")[0] for t in r["tools"]}
+    paths_by_type.setdefault(r["type"], set()).update(kinds)
+for t in types:
+    t["paths"] = sorted(paths_by_type.get(t["type"], set()))
 
 payload = {
     "customer": data.get("customer"), "generated": data["generated"],

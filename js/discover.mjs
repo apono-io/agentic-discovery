@@ -764,8 +764,8 @@ function buildReport() {
   add("## Summary"); add("");
   add(`On this machine, **${usedAgents} agent app(s)** show real activity. Their agents used ` +
       `**${nMcpUsed} MCP server(s)** and reached **${reported.length} corporate resources** ` +
-      `(cloud, databases, SaaS); **${writes} of those received changes or privileged actions** ` +
-      `(create/update/delete/admin).`);
+      `(cloud, databases, SaaS); **${writes} of those received updates or privileged actions** ` +
+      `(create / update / delete / admin).`);
   if (STATS.external)
     add(`Resource identification rate: ${STATS.resolved}/${STATS.external} externally-reaching ` +
         `actions (${Math.floor((100 * STATS.resolved) / STATS.external)}%).`);
@@ -801,7 +801,7 @@ function buildReport() {
     any = true;
     rows.sort((x, y) => y.calls - x.calls || cmp(x.rid, y.rid));
     add(`### ${gname}`); add("");
-    add("| Resource | Type | Access | Categories seen | Tool type & tool used | Agent(s) | Calls | Last seen |");
+    add("| Resource | Type | Access | Intent categories | Tool type & tool used | Agent(s) | Calls | Last seen |");
     add("|---|---|---|---|---|---|---|---|");
     const limit = (R.rowLimits[gname] !== undefined ? R.rowLimits[gname] : R.rowLimits.default) || rows.length;
     for (const r of rows.slice(0, limit)) {

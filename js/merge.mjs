@@ -179,7 +179,7 @@ function render(reports, merged, opts) {
   add("");
   add(`Across **${reports.length} machines**, AI agents accessed **${resources.length} corporate ` +
       `resources** through **${tools.size} distinct tools**; **${writes.length} of those resources ` +
-      `received changes or privileged actions** (create / update / delete / admin); ` +
+      `received updates or privileged actions** (create / update / delete / admin); ` +
       `**${byStatus("supported").length + byStatus("oauthMcp").length} are within Apono's ` +
       `coverage today** \u2014 ${byStatus("supported").length} through native integrations and ` +
       `${byStatus("oauthMcp").length} through custom OAuth MCP.`);
@@ -216,7 +216,7 @@ function render(reports, merged, opts) {
   /* By type is what scopes a POC: one row per integration an admin would actually onboard. */
   add("## Integrations to onboard, by resource type");
   add("");
-  add("| Resource type | Apono coverage | Resources | Machines | Writes | Calls | Tools |");
+  add("| Resource type | Apono coverage | Resources | Machines | Updates | Calls | Tools |");
   add("|---|---|---|---|---|---|---|");
   const byType = new Map();
   for (const r of resources) {

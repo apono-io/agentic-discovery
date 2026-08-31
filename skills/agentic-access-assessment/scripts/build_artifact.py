@@ -215,7 +215,7 @@ footer{margin-top:44px; padding-top:20px; border-top:1px solid var(--line); colo
     <div class="controls">
       <div class="chips" role="group" aria-label="Filter by access">
         <button class="chip" data-acc="all" aria-pressed="true">All access</button>
-        <button class="chip" data-acc="write" aria-pressed="false">Changes only</button>
+        <button class="chip" data-acc="write" aria-pressed="false">Updates only</button>
         <button class="chip" data-acc="sev" aria-pressed="false">Admin &amp; delete</button>
         <button class="chip" data-acc="cli" aria-pressed="false">Direct CLI</button>
       </div>
@@ -227,7 +227,7 @@ footer{margin-top:44px; padding-top:20px; border-top:1px solid var(--line); colo
         <thead><tr>
           <th>Resource type</th><th>Apono coverage</th>
           <th class="num">Resources</th><th class="num">Machines</th>
-          <th class="num">With changes</th><th class="num">Calls</th><th>Access path</th>
+          <th class="num">With updates</th><th class="num">Calls</th><th>Access path</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -291,7 +291,7 @@ h.appendChild(el("b", null, S.types + " types of corporate resource"));
 h.appendChild(document.createTextNode(", and " + S.covered + " of those are within Apono\\u2019s coverage today."));
 document.getElementById("lede").textContent =
   S.resources + " individual resources across " + S.machines + " machines. " +
-  S.writeTypes + " of the " + S.types + " types saw changes rather than reads alone" +
+  S.writeTypes + " of the " + S.types + " types saw updates rather than reads alone" +
   (S.admin || S.delete ? " \\u2014 including " + S.admin + " with admin actions and " + S.delete + " with deletes." : ".") +
   " " + S.cliOnly + " of the " + S.types + " types were reached only by a command-line tool, with no " +
   "MCP server anywhere in the path" +
@@ -307,7 +307,7 @@ const TILES = [
   ["cliOnly", "types reached only by direct CLI, no MCP server in the path", 2],
   ["mcpOnly", "types reached only through MCP servers", 0],
   ["mixedTypes", "types reached both ways \u2014 a brokered path exists and is bypassed", 2],
-  ["writeTypes", "types with changes", 0],
+  ["writeTypes", "types with updates (create, update, delete or admin)", 0],
   ["severe", "resources with admin or delete", 1],
   ["shadow", "servers used but never configured", 0],
   ["idle", "servers configured but never used", 0],

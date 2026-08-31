@@ -1057,8 +1057,21 @@
       "note": "A short hash of the salt, printed in the report header so reports can be checked for comparability before merging. It identifies the salt without revealing it; use a high-entropy --salt if the salt itself must resist guessing."
     },
     "machineLabel": {
-      "length": 8,
-      "note": "The machine is named by a stable label derived from its hostname and the salt, used in the report filename and body. Hostnames routinely contain an employee's name; the label lets a customer match a machine to an asset by recomputing it, without the name appearing anywhere in what gets shared."
+      "mask": "___",
+      "note": "A hostname is usually <person>-<model>. The person segment is masked but keeps its first and last letter, so a label like n___s-MacBook-Pro stays recognisable to someone who knows the team while the name itself is not written down. The mask is fixed-width so the name's length is not disclosed either. This is pseudonymous rather than anonymous, and deliberately so: an unreadable label is not one anybody can act on.",
+      "genericPrefixes": [
+        "desktop",
+        "laptop",
+        "pc",
+        "win",
+        "macbook",
+        "imac",
+        "workstation",
+        "ws",
+        "host",
+        "vm",
+        "ubuntu"
+      ]
     }
   },
   "connectorFingerprints": [

@@ -93,11 +93,12 @@ is not is worse than saying nothing.
 **Machine counts, not user counts.** One person with two laptops counts twice. There is no
 per-user attribution by design.
 
-**Machines appear as `machine-a1b2c3d4`, not by hostname.** The label is derived from the hostname
-and the shared salt, so it is stable across runs and the customer can match it back to an asset by
-recomputing it — while the hostname, which usually contains an employee's name, stays out of
-everything you send. Reports produced before this scheme carry the real hostname; the assessment
-substitutes neutral labels for those and tells you how many were affected.
+**Machines are named as their own reports name them.** By default a report masks the person part of
+its hostname but keeps the first and last letter — `N___s-MacBook-Pro` — so you can tell whose
+machine it is without the full name being written down, and a customer can match it to an asset.
+The assessment passes that through unchanged; it never masks a second time. Two caveats: a report
+run with `--no-redact` carries the real hostname, and because masking keeps only two letters, two
+machines can collide on one label — the assessment warns you when that happens.
 
 **Reports are internal data.** They are gitignored for a reason: even redacted, they describe a
 customer's estate. Keep them out of the repository and out of shared drives that outlive the

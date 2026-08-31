@@ -665,17 +665,26 @@ const tagOf = (s) => crypto.createHash("sha256").update(`${SALT}\u0000${s}`).dig
 const saltFingerprint = () => crypto.createHash("sha256")
   .update(`agentic-discovery/salt-fingerprint\u0000${SALT}`).digest("hex")
   .slice(0, (RD.saltFingerprint && RD.saltFingerprint.length) || 8);
-/* The machine's own name leaks an employee's name -- hostnames are routinely "dpatel-laptop".
-   So the machine is identified by a stable label derived from its hostname and the shared salt.
-   It goes in the report filename, the report itself and anything built from it, so a customer can
-   match a machine to an asset by recomputing the label, while nothing carries the full name. */
+/* A hostname is usually "<person>-<model>", so the person's name sits in the first segment.
+   Masking that segment while keeping its first and last letter leaves a label a colleague can
+   recognise at a glance -- n___s-MacBook-Pro -- without writing the name down. The mask is a fixed
+   width so it does not also disclose how long the name is. Pseudonymous, not anonymous: with a
+   small team, first letter plus last letter narrows it down, which is the trade being made for a
+   label people can actually use. --no-redact keeps the hostname as it is. */
 function machineLabel() {
   const host = os.hostname().split(".")[0];
   if (!REDACT) return host;
-  const h = crypto.createHash("sha256")
-    .update(`agentic-discovery/machine\u0000${SALT}\u0000${host}`).digest("hex")
-    .slice(0, (RD.machineLabel && RD.machineLabel.length) || 8);
-  return `machine-${h}`;
+  const mask = (RD.machineLabel && RD.machineLabel.mask) || "___";
+  const i = host.indexOf("-");
+  const person = i === -1 ? host : host.slice(0, i);
+  const rest = i === -1 ? "" : host.slice(i);
+  // DESKTOP-A1B2C3 and the like carry no name -- masking them hides nothing and costs legibility.
+  const generic = (RD.machineLabel && RD.machineLabel.genericPrefixes) || [];
+  if (generic.includes(person.toLowerCase())) return host;
+  const masked = person.length >= 3
+    ? person[0] + mask + person[person.length - 1]
+    : mask;                       // too short to reveal anything safely
+  return masked + rest;
 }
 function redactRid(rid) {
   if (!REDACT) return rid;

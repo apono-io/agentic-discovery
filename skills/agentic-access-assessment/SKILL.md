@@ -52,25 +52,28 @@ customer something is supported when it is not is worse than telling them nothin
 **Redaction.** Reports should say "Resource names are redacted". If one was run with
 `--no-redact`, it contains real resource names — do not put that in an artifact without asking.
 
-## Step 3 — machine identity is already handled, but check it
+## Step 3 — machine identity is decided at scan time, not here
 
-The scanner names each machine with a stable redacted label — `machine-a1b2c3d4` — derived from the
-hostname and the shared salt, and uses it in the report filename, the report body, and everything
-built from it. That exists because hostnames routinely contain an employee's name
-(`dpatel-laptop`), and this assessment reports at machine level by design. The label is
-deterministic, so a customer who knows their asset list and the salt can match a label back to a
-machine, and each participant is told their own label when they run the scan.
+Each report names its own machine, and that name flows through the merge and into the artifact
+untouched. Do not mask it again: an assessment that hides more than its own inputs is harder to act
+on and invites the reader to distrust both.
 
-So there is usually nothing to do here. Two things still deserve a look:
+What the scanner does by default: a hostname is usually `<person>-<model>`, so it masks the person
+segment while keeping its first and last letter — `Nufars-MacBook-Pro` becomes
+`N___s-MacBook-Pro`. That is deliberately pseudonymous rather than anonymous. A colleague who knows
+the team can tell whose machine it is, which is the point: an SE needs to ask that person a follow-up
+question, and a customer needs to match a label to an asset. Generic prefixes like `DESKTOP-A1B2C3`
+are left alone, since there is no name in them to hide.
 
-**Older reports carry real hostnames.** Anything produced before this scheme names the machine
-directly. The builder detects those and substitutes neutral labels (`Machine A`, `Machine B`), and
-the assessment says how many were affected. If it is only a machine or two, re-running them is
-better than living with two naming schemes in one document.
+Two things to look at:
 
-**A report run with `--no-redact`** names the machine and its resources in full. That is a
-legitimate choice for reading your own report; it is not something to put in a shared artifact
-without asking the person whose machine it is.
+**A report run with `--no-redact`** names its machine and its resources in full. That is a
+legitimate choice for reading your own report. Before putting it in a shared artifact, check the
+person whose machine it is is comfortable with that — you are the one publishing it.
+
+**Colliding labels.** Masking keeps only the first and last letter, so two machines can land on the
+same label and get merged into one row. The assessment flags this when it happens; distinguish them
+before quoting machine counts.
 
 ## Step 4 — build the artifact
 
@@ -81,8 +84,7 @@ design from scratch each time and every customer gets the same document:
 python3 scripts/build_artifact.py <assessment>.json    # writes assessment.html
 ```
 
-It handles the legacy-hostname fallback from step 3, the coverage badges, the drill-down, the
-filters and the limitations list. Read it before assuming it does something it does not, and edit it rather
+It handles the coverage badges, the drill-down, the filters and the limitations list. Read it before assuming it does something it does not, and edit it rather
 than working around it — a per-customer variant that drifts from this one costs the consistency
 that makes the document recognisable.
 

@@ -305,6 +305,13 @@ function render(reports, merged, opts) {
     add(`- **Comparability could not be verified.** These reports predate salt fingerprinting ` +
         `(v0.8), so nothing in them proves they used the same salt. They will have matched correctly ` +
         `if every machine used the default (organization domain) and none passed \`--salt\`.`);
+  const labelCounts = reports.reduce((a, r) => (a[r.machine] = (a[r.machine] || 0) + 1, a), {});
+  const collided = Object.entries(labelCounts).filter(([, n]) => n > 1).map(([l]) => l);
+  if (collided.length)
+    add(`- **Two or more reports share a machine label (${collided.join(", ")}).** A masked label ` +
+        `keeps only the first and last letter of the name, so different machines can land on the ` +
+        `same one; their rows are merged above as though they were one machine. Re-run those with ` +
+        `\`--no-redact\` or distinguish them by hand before relying on the machine counts.`);
   const totalDropped = reports.flatMap((r) => r.dropped).reduce((n, d) => n + d.count, 0);
   if (totalDropped)
     add(`- **${totalDropped} row(s) were truncated out of the source reports** and are missing here. ` +

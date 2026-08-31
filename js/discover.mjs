@@ -70,12 +70,23 @@ function buildProfiles() {
       const name = path.basename(base);
       if (["public", "default", "default user", "all users", "desktop.ini"].includes(name.toLowerCase())) continue;
       const roaming = path.join(base, "AppData", "Roaming");
-      if (isDir(roaming)) profs.push(mk(`Windows user '${name}' (via WSL)`, base, roaming));
+      if (isDir(roaming)) profs.push(mk(`windows-profile:${name}`, base, roaming));
     }
   }
   return profs;
 }
 const PROFILES = buildProfiles();
+/* Called once the salt is known: a Windows profile name is a username, so redact it too. */
+function redactProfileLabels() {
+  if (!REDACT) return;
+  for (const p of PROFILES) {
+    const m = /^windows-profile:(.+)$/.exec(p.label);
+    if (!m) continue;
+    const h = crypto.createHash("sha256")
+      .update(`agentic-discovery/machine\u0000${SALT}\u0000${m[1]}`).digest("hex").slice(0, 8);
+    p.label = `Windows profile ${h} (via WSL)`;
+  }
+}
 
 // ---------------------------------------------------------------- classification
 const SQL_CATS = R.sqlCats.map(([c, rx]) => [c, new RegExp(rx, "i")]);
@@ -654,6 +665,18 @@ const tagOf = (s) => crypto.createHash("sha256").update(`${SALT}\u0000${s}`).dig
 const saltFingerprint = () => crypto.createHash("sha256")
   .update(`agentic-discovery/salt-fingerprint\u0000${SALT}`).digest("hex")
   .slice(0, (RD.saltFingerprint && RD.saltFingerprint.length) || 8);
+/* The machine's own name leaks an employee's name -- hostnames are routinely "dpatel-laptop".
+   So the machine is identified by a stable label derived from its hostname and the shared salt.
+   It goes in the report filename, the report itself and anything built from it, so a customer can
+   match a machine to an asset by recomputing the label, while nothing carries the full name. */
+function machineLabel() {
+  const host = os.hostname().split(".")[0];
+  if (!REDACT) return host;
+  const h = crypto.createHash("sha256")
+    .update(`agentic-discovery/machine\u0000${SALT}\u0000${host}`).digest("hex")
+    .slice(0, (RD.machineLabel && RD.machineLabel.length) || 8);
+  return `machine-${h}`;
+}
 function redactRid(rid) {
   if (!REDACT) return rid;
   const pfx = (RD.preservePrefixes || []).find((p) => rid.startsWith(p)) || "";
@@ -704,7 +727,7 @@ function platformLine() {
 }
 function buildReport() {
   const now = new Date().toISOString().slice(0, 16).replace("T", " ");
-  const host = os.hostname();
+  const host = machineLabel();
   const L = []; const add = (s) => L.push(s);
   const reported = [...RES.values()].filter((r) => isReported(r.rtype));
   const usedAgents = [...AGENTS.values()].filter((a) => a.actions).length;
@@ -828,6 +851,7 @@ async function main() {
     const dom = findEmailDomain(PROFILES[0]);
     if (dom) { SALT = dom; SALT_BASIS = "organization domain"; }
   } else if (REDACT && SALT) SALT_BASIS = "explicit salt";
+  redactProfileLabels();
   console.log(REDACT
     ? `Resource names will be REDACTED (${SALT_BASIS || "no salt found -- pass --salt for consistent, unguessable tags"}).`
     : "Resource names will be shown in FULL (--no-redact). Do not share this copy unless you intend to.");
@@ -841,9 +865,10 @@ async function main() {
     }
   }
   const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  const base = path.join(outDir, `agentic-access-report-${os.hostname().split(".")[0]}-${stamp}`);
+  const base = path.join(outDir, `agentic-access-report-${machineLabel()}-${stamp}`);
   writeReport(base + ".md", buildReport());
-  console.log(`\nReport written to: ${base}.md`);
+  console.log(`\nThis machine is reported as: ${machineLabel()}`);
+  console.log(`Report written to: ${base}.md`);
   if (argv.includes("--json")) {
     const clean = (v) => (v instanceof Set ? [...v].sort() : v);
     const obj = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, clean(v)]));

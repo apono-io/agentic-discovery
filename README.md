@@ -17,9 +17,16 @@ Then one command — nothing to clone, nothing left installed:
 npx github:apono-io/agentic-discovery
 ```
 
-It takes a few minutes and prints where it saved the report:
+It takes a few minutes, tells you the label your machine is reported under, and prints where it
+saved the report:
 
-    agentic-access-report-<your-computer>-<date>.md
+    This machine is reported as: machine-a1b2c3d4
+    agentic-access-report-machine-a1b2c3d4-<date>.md
+
+Your computer's name is not in the file or in the report. Computer names usually contain a person's
+name, and this report is about machines, not people — so it uses a scrambled label instead. The
+label is stable, so whoever collects the reports can tell machines apart and your own IT can match
+a label back to a machine, but the name itself is not in anything you send.
 
 Open that file in any text editor, or preview it on macOS with:
 

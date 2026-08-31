@@ -1055,6 +1055,10 @@
     "saltFingerprint": {
       "length": 8,
       "note": "A short hash of the salt, printed in the report header so reports can be checked for comparability before merging. It identifies the salt without revealing it; use a high-entropy --salt if the salt itself must resist guessing."
+    },
+    "machineLabel": {
+      "length": 8,
+      "note": "The machine is named by a stable label derived from its hostname and the salt, used in the report filename and body. Hostnames routinely contain an employee's name; the label lets a customer match a machine to an asset by recomputing it, without the name appearing anywhere in what gets shared."
     }
   },
   "connectorFingerprints": [

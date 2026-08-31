@@ -8,6 +8,18 @@ res = data["resources"]
 mcp = data["mcpServers"]
 machines = data["machines"]
 
+# Reports from the current scanner already name the machine with a redacted, stable label
+# (machine-xxxxxxxx) in both filename and body, so it flows straight through. Older reports carry
+# the real hostname -- which usually contains an employee's name -- so those get neutral labels.
+import re as _re
+LEGACY = [m["machine"] for m in machines if not _re.fullmatch(r"machine-[0-9a-f]{8}", m["machine"])]
+alias = {n: f"Machine {chr(65 + i)}" for i, n in enumerate(sorted(set(LEGACY)))}
+if alias:
+    for m in machines:
+        m["machine"] = alias.get(m["machine"], m["machine"])
+    for r in res:
+        r["machines"] = sorted(alias.get(x, x) for x in r["machines"])
+
 n_types = len(types)
 n_res = len(res)
 write_types = sum(1 for t in types if t["writes"])
@@ -486,8 +498,16 @@ else:
     limits.append("**All machines share one salt fingerprint**, so resources matched correctly across them.")
 limits.append("**Resource names are redacted.** Types, access levels, tools, machine counts and "
               "dates are exact; the names behind the masked identifiers are not recoverable from this page.")
-limits.append("**Machine names are replaced with neutral labels.** Hostnames usually contain "
-              "employees' names, and this assessment reports at machine level by design.")
+if alias:
+    limits.append(f"**{len(alias)} machine(s) reported their real hostname** and were given neutral "
+                  "labels here, because hostnames usually contain an employee's name. Reports from "
+                  "the current scanner arrive already labelled machine-xxxxxxxx, which a customer "
+                  "can match back to an asset by recomputing the label.")
+else:
+    limits.append("**Machines are identified by a stable redacted label** (machine-xxxxxxxx) derived "
+                  "from the hostname and the shared salt. A customer can match a label to an asset by "
+                  "recomputing it; the hostname itself, which usually contains an employee's name, "
+                  "appears nowhere in this page or in the reports behind it.")
 limits.append(f"**Coverage labels go stale.** {data['catalogNote']}")
 
 # Access path per type: CLI means the agent reached it without going through any MCP server.

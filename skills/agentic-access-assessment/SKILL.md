@@ -125,21 +125,29 @@ The page is structured around the type view, in this order:
    while every SaaS type went through MCP. If that only shows up after expanding a row, the reader
    will miss it.
 
-3. **Drill-down per type.** Clicking a type row expands to its individual resources with their
+3. **Report the intent categories separately, never as one rollup.** "Anything that is not a read"
+   collapses a create and an admin into the same number, and those call for different conversations.
+   Show `read / create / update / delete / admin` as their own counts — fleet-wide in a strip near
+   the top, per type in the table, per resource in the drill-down — and let each be filtered on
+   directly. A single resource commonly carries several categories, so these counts overlap by
+   design and do not sum to the resource total; the tile for "resources with privileged access"
+   is the one honest single number.
+
+4. **Drill-down per type.** Clicking a type row expands to its individual resources with their
    redacted id, access level, machines, tools and last-seen date. Keep it inside the page — no
    navigation away, no second file. The SE will be asked "which ones?" live in a meeting.
 
-4. **Filters that answer real questions**: writes only, admin/delete only, direct CLI, by coverage
+5. **Filters that answer real questions**: writes only, admin/delete only, direct CLI, by coverage
    tier, and a text search. Each corresponds to a question someone actually asks — "what can they
    change?", "what did they reach without any MCP server in the path?", "what can't you govern yet?".
 
-5. **MCP servers**, split into *used but in no config file* (connectors and plugins — the shadow
+6. **MCP servers**, split into *used but in no config file* (connectors and plugins — the shadow
    surface) and *configured but never used* (unnecessary standing capability). Both halves are
    findings; label them so it is obvious which is which. Show **machines and calls** for each: one
    server on six machines is an organisation-wide pattern, the same call count on one machine is one
    person's experiment, and those need different responses.
 
-6. **Limitations, visible rather than buried** — truncated rows, fingerprint status, the catalog
+7. **Limitations, visible rather than buried** — truncated rows, fingerprint status, the catalog
    date. A customer will read this section, and its presence is what makes the rest credible.
 
 Build the tables from the JSON by embedding the data in the page and rendering with a small script,

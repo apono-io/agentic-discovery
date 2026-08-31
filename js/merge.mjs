@@ -216,21 +216,24 @@ function render(reports, merged, opts) {
   /* By type is what scopes a POC: one row per integration an admin would actually onboard. */
   add("## Integrations to onboard, by resource type");
   add("");
-  add("| Resource type | Apono coverage | Resources | Machines | Updates | Calls | Tools |");
-  add("|---|---|---|---|---|---|---|");
+  add("| Resource type | Apono coverage | Resources | Machines | read | create | update | delete | admin | Calls |");
+  add("|---|---|---|---|---|---|---|---|---|---|");
+  const INTENTS = ["read", "create", "update", "delete", "admin"];
   const byType = new Map();
   for (const r of resources) {
     const v = byType.get(r.rtype) || { rtype: r.rtype, n: 0, machines: new Set(),
-                                       writes: 0, calls: 0, tools: new Set() };
+                                       calls: 0, tools: new Set(),
+                                       intents: Object.fromEntries(INTENTS.map((c) => [c, 0])) };
     byType.set(r.rtype, v);
-    v.n++; v.calls += r.calls; if (hasWrite(r.cats)) v.writes++;
+    v.n++; v.calls += r.calls;
+    for (const c of INTENTS) if (r.cats.has(c)) v.intents[c]++;
     r.machines.forEach((m) => v.machines.add(m)); r.tools.forEach((t) => v.tools.add(t));
   }
   const statusRank = { supported: 0, oauthMcp: 1, roadmap: 2, unsupported: 3, unknown: 4 };
   for (const t of [...byType.values()].sort((a, b) =>
         statusRank[catalogStatus(a.rtype)] - statusRank[catalogStatus(b.rtype)] || b.calls - a.calls))
     add(`| ${t.rtype} | ${catalogLabel(catalogStatus(t.rtype))} | ${t.n} | ${t.machines.size} ` +
-        `| ${t.writes} | ${t.calls} | ${t.tools.size} |`);
+        `| ${INTENTS.map((c) => t.intents[c] || "-").join(" | ")} | ${t.calls} |`);
   add("");
 
   add("## Every resource, by Apono coverage");

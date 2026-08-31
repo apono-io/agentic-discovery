@@ -11,7 +11,7 @@ One codebase, two distribution channels, and a deliberate split between **lean r
 |---|---|---|
 | `js/discover.mjs` | the runner — path resolution, file walking, extraction engine, report rendering | rarely |
 | `js/rules.json` | everything that churns — host locations, extraction rules, category maps, report copy | constantly |
-| `js/package.json` | npm packaging for the `npx` channel | rarely |
+| `package.json` | npm packaging for the `npx` channel (must stay at the repo root) | rarely |
 | `agentic_discovery.py` | **frozen** Python reference (v0.3) the JS port was parity-tested against | not maintained |
 
 The rule of thumb: **if you are editing `discover.mjs` to add coverage, stop and check whether it
@@ -93,6 +93,17 @@ option for assessments where short names must be unguessable. Whatever was used 
 report header.
 
 Anything added to the report that contains a customer identifier must go through `redactRid()`.
+
+## Distribution channels
+
+**`npx github:apono-io/agentic-discovery`** works today because `package.json` sits at the
+repository root with `bin -> js/discover.mjs`. npx clones the repo behind the scenes, so **while
+this repository is private only people whose git credentials can read it can run that command.**
+Prospect employees cannot, until either the repository is public or the package is published to
+npm. That is the same publication decision as making the repo public — do it deliberately.
+
+`package.json` carries `"private": true` to prevent an accidental `npm publish` before that
+decision is made. Remove it when publishing is intended, and pin the version at the same time.
 
 ## Building and publishing
 

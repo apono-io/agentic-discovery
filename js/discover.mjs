@@ -658,7 +658,7 @@ function redactRid(rid) {
   if (!REDACT) return rid;
   const pfx = (RD.preservePrefixes || []).find((p) => rid.startsWith(p)) || "";
   const body = rid.slice(pfx.length);
-  const mask = RD.mask || "····";
+  const mask = RD.mask || "\u00b7\u00b7\u00b7\u00b7";
   const shown = body.length >= (RD.minLengthForReveal || 8)
     ? mask + body.slice(-(RD.keepLast || 4))
     : mask;
@@ -674,7 +674,7 @@ function mdSafe(v) {
     .replace(/[\u0000-\u001f\u007f\u2028\u2029]/g, " ")  // newlines & control chars
     .replace(/\|/g, "\u00a6")                                 // table-cell separator
     .replace(/`/g, "'")                                        // code-span escape
-    .replace(/^[#>+*-]\s/, "· ");                              // line-leading structure
+    .replace(/^[#>+*-]\s/, "\u00b7 ");                              // line-leading structure
 }
 const fmtTs = (ts) => (ts ? String(ts).slice(0, 10) : "-");
 const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -714,7 +714,7 @@ function buildReport() {
   add(`# Agentic Access Report -- ${host}`); add("");
   add(`*Generated ${now} on ${platformLine()} | agentic-discovery v${VERSION} (js) | read-only scan | nothing was transmitted*`);
   if (REDACT)
-    add(`*Resource names are redacted (${SALT_BASIS || "unsalted"} · salt fingerprint ` +
+    add(`*Resource names are redacted (${SALT_BASIS || "unsalted"} \u00b7 salt fingerprint ` +
         `${saltFingerprint()}) -- types, tools, access types and counts are exact; names are not. ` +
         `Reports can only be consolidated with each other when this fingerprint matches.*`);
   add("");

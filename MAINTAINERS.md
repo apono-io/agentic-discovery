@@ -109,6 +109,25 @@ with missing ones (warns at the top and inflates nothing silently), all missing 
 could not be verified — never claims it was). Keep that distinction; claiming verification we did
 not do is worse than admitting the gap.
 
+## Keep the source plain ASCII text
+
+`js/*.mjs` must stay ASCII with no control characters. Write non-ASCII as JS escapes
+(`\u00b7`, `\u2014`) rather than literal characters, and never put a raw NUL in a
+string -- use `\u0000`.
+
+This is not aesthetics. A single raw NUL byte in `merge.mjs` made `file(1)` report the source as
+binary data and made `grep` skip it silently: searching for a string that occurs three times
+returned no match with exit status 1. A maintainer greps for a symbol, finds nothing, and concludes
+it does not exist. Check with:
+
+```bash
+file js/*.mjs        # must say "ASCII text", not "binary data"
+```
+
+Note also that this repo's development shell wraps `grep` in a function that behaves differently
+from `/usr/bin/grep` on such files, which is what masked the problem -- verify with `/usr/bin/grep`
+when a search result surprises you.
+
 ## Distribution channels
 
 **`npx github:apono-io/agentic-discovery`** works today because `package.json` sits at the

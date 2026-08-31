@@ -449,12 +449,15 @@ summary = {
     "admin": admin_n, "delete": delete_n, "severe": admin_n + delete_n,
     "shadow": len(shadow), "idle": len(idle),
 }
-limits = []
+limits = list(data.get("verifiedNotes", []))   # empirical findings override the generic caveats
 if truncated:
     limits.append(f"**{truncated} rows are missing.** These machines ran an older version that "
                   f"capped each section of its report. Counts here are exact for the rows present "
                   f"and understate the true totals; re-run those machines to close the gap.")
-if prints == {None}:
+skip_fp = any("salt" in n.lower() for n in data.get("verifiedNotes", []))
+if skip_fp:
+    pass
+elif prints == {None}:
     limits.append("**Comparability is unverified.** These reports predate salt fingerprinting, so "
                   "nothing in them proves every machine used the same redaction salt. They matched "
                   "correctly if all used the default organization domain and none passed a custom salt.")

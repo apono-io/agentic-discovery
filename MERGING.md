@@ -9,24 +9,25 @@ Agentic Access Assessment you can put in front of a customer.
 npx github:apono-io/agentic-discovery
 ```
 
-They get **two files** — `agentic-access-report-<machine>-<date>.md` (the human-readable one they
-review) and a matching `.json`. **Ask for both.** The `.md` alone is fine to read but its tables
-are capped at 25 rows per section, so merging from `.md` only silently drops everything below the
-cut — in our internal pilot that was about half the rows. The merger uses the `.json` when it is
-there and tells you what was lost when it is not.
+They get one file — `agentic-access-report-<machine>-<date>.md` — which they read and send you.
+That single Markdown file is the complete input: every row is in it, nothing is truncated. (A
+`--json` copy exists for tooling, but you do not need it.)
 
 Nothing else is required of participants: no flags, no coordination. Redaction is on by default and
 salted with your organization's email domain, which is what makes reports from different machines
 line up — the same resource redacts to the same value everywhere.
+
+**Reports from v0.7 and earlier capped each section at 25 rows.** If you are merging older reports,
+the assessment will tell you how many rows are missing; re-run those machines on the current
+version if the totals need to be exact.
 
 ## 2. Put them all in one folder
 
 ```
 Reports/
   agentic-access-report-machine-a-20260831.md
-  agentic-access-report-machine-a-20260831.json
   agentic-access-report-machine-b-20260831.md
-  agentic-access-report-machine-b-20260831.json
+  agentic-access-report-machine-c-20260831.md
 ```
 
 Names do not matter as long as they start with `agentic-access-report-`.
@@ -55,15 +56,22 @@ sorted by volume.
 them — they set expectations, and they are the most honest roadmap input we get. But know them
 before the meeting.
 
+**The salt fingerprint column in the machines table.** Every report header carries a short hash of
+the salt that produced its redaction tags. Reports can only be consolidated when those match — the
+merger checks automatically, puts a warning at the very top of the assessment if they differ, and
+says so plainly in the limitations when they agree. You never need to compare them by hand, but if
+you see that warning, stop and fix the inputs rather than shipping the document.
+
 **The limitations section at the bottom.** It states truncated rows, mixed redaction settings, and
 the catalog caveat. Read it, because a customer will.
 
 ## Things that will bite you
 
 **Mixed salts cannot be merged.** If one participant ran with an explicit `--salt` and another did
-not, the same resource redacts differently and appears as two separate resources. The assessment
-flags this at the bottom. Either everyone uses the default (the organization domain) or everyone
-uses the same `--salt`.
+not, the same resource redacts differently and appears as two separate resources — inflating every
+total. The salt fingerprints in the machines table make this visible, and the merger refuses to
+pretend otherwise. Either everyone uses the default (the organization domain) or everyone uses the
+same `--salt`.
 
 **The catalog is a moving product fact.** Coverage labels come from `aponoCatalog` in
 `js/rules.json`, current as of the date noted there. **Re-check it against today's integration

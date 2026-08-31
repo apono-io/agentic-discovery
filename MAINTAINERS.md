@@ -94,6 +94,21 @@ report header.
 
 Anything added to the report that contains a customer identifier must go through `redactRid()`.
 
+## Report format is a merge input — do not truncate it
+
+`rowLimits.default` is `0` (no limit) deliberately. The Markdown report is the only artifact we can
+rely on receiving from a participant, so **every row must be in it**; re-introducing a per-section
+cap silently breaks consolidation. In our internal pilot the old 25-row cap dropped 101 of 202
+rows. Per-resource tool lists stay capped (`maxViaPerResource`) because a resource reached through
+50 tools is unreadable, and that loss is stated in the assessment.
+
+The header carries a **salt fingerprint** — `sha256("agentic-discovery/salt-fingerprint\0" + salt)`
+truncated — so reports can be checked for comparability without revealing the salt. The merger
+treats three cases differently: all fingerprints equal (confirms matching), any difference or a mix
+with missing ones (warns at the top and inflates nothing silently), all missing (says comparability
+could not be verified — never claims it was). Keep that distinction; claiming verification we did
+not do is worse than admitting the gap.
+
 ## Distribution channels
 
 **`npx github:apono-io/agentic-discovery`** works today because `package.json` sits at the

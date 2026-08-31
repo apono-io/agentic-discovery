@@ -1,5 +1,5 @@
 {
-  "rulesVersion": "0.7",
+  "rulesVersion": "0.8",
   "verbOrder": [
     "admin",
     "delete",
@@ -587,9 +587,10 @@
   ],
   "excludedGroupsNote": "General web browsing and code-hosting (GitHub/git) access are collected but not reported here, by configuration.",
   "rowLimits": {
-    "default": 25
+    "default": 0,
+    "note": "0 = no limit. The Markdown report is the only artifact we can rely on receiving, so it must contain every row."
   },
-  "maxViaPerResource": 3,
+  "maxViaPerResource": 12,
   "hosts": [
     {
       "name": "Claude Code",
@@ -1050,7 +1051,11 @@
       ],
       "note": "Redaction tags are salted with the organization's email domain by default, so every machine in the same organization redacts identically and the reports consolidate. The domain is not a secret -- for an assessment where short names must be unguessable, pass an explicit --salt instead."
     },
-    "note": "Resource names are redacted: only the last {keepLast} characters are shown, and only where the name is long enough that this reveals little. Shorter names are masked completely. Every entry carries a short tag (#xxxx) derived from the full name so that distinct resources stay distinct in this report and match up correctly when reports from several machines are combined. The tag is a one-way hash; with an assessment salt (--salt) it cannot be reversed by guessing."
+    "note": "Resource names are redacted: only the last {keepLast} characters are shown, and only where the name is long enough that this reveals little. Shorter names are masked completely. Every entry carries a short tag (#xxxx) derived from the full name so that distinct resources stay distinct in this report and match up correctly when reports from several machines are combined. The tag is a one-way hash; with an assessment salt (--salt) it cannot be reversed by guessing.",
+    "saltFingerprint": {
+      "length": 8,
+      "note": "A short hash of the salt, printed in the report header so reports can be checked for comparability before merging. It identifies the salt without revealing it; use a high-entropy --salt if the salt itself must resist guessing."
+    }
   },
   "connectorFingerprints": [
     {

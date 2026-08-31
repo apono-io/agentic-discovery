@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Agentic Access Discovery -- per-machine report (JS runner v0.7)
+ * Agentic Access Discovery -- per-machine report (JS runner v0.8)
  *
  * One codebase, two channels:
  *   Node:    node discover.mjs   (or: npx @apono-io/agentic-discovery)
@@ -17,7 +17,7 @@ import path from "node:path";
 import os from "node:os";
 import crypto from "node:crypto";
 
-const VERSION = "0.7";
+const VERSION = "0.8";
 const HOME = os.homedir();
 const R = JSON.parse(fs.readFileSync(new URL("./rules.json", import.meta.url), "utf-8"));
 
@@ -649,6 +649,11 @@ function findEmailDomain(prof) {
 }
 const tagOf = (s) => crypto.createHash("sha256").update(`${SALT}\u0000${s}`).digest("hex")
                            .slice(0, RD.tagLength || 4);
+/* Identifies which salt produced this report's tags, without revealing the salt. Reports can
+   only be merged with each other when these match. */
+const saltFingerprint = () => crypto.createHash("sha256")
+  .update(`agentic-discovery/salt-fingerprint\u0000${SALT}`).digest("hex")
+  .slice(0, (RD.saltFingerprint && RD.saltFingerprint.length) || 8);
 function redactRid(rid) {
   if (!REDACT) return rid;
   const pfx = (RD.preservePrefixes || []).find((p) => rid.startsWith(p)) || "";
@@ -708,7 +713,10 @@ function buildReport() {
   const nMcpUsed = [...MCP.values()].filter((r) => r.used).length;
   add(`# Agentic Access Report -- ${host}`); add("");
   add(`*Generated ${now} on ${platformLine()} | agentic-discovery v${VERSION} (js) | read-only scan | nothing was transmitted*`);
-  if (REDACT) add(`*Resource names are redacted (${SALT_BASIS || "unsalted"}) -- types, tools, access types and counts are exact; names are not.*`);
+  if (REDACT)
+    add(`*Resource names are redacted (${SALT_BASIS || "unsalted"} · salt fingerprint ` +
+        `${saltFingerprint()}) -- types, tools, access types and counts are exact; names are not. ` +
+        `Reports can only be consolidated with each other when this fingerprint matches.*`);
   add("");
   add("## Summary"); add("");
   add(`On this machine, **${usedAgents} agent app(s)** show real activity. Their agents used ` +
@@ -752,7 +760,7 @@ function buildReport() {
     add(`### ${gname}`); add("");
     add("| Resource | Type | Access | Categories seen | Tool type & tool used | Agent(s) | Calls | Last seen |");
     add("|---|---|---|---|---|---|---|---|");
-    const limit = R.rowLimits[gname] !== undefined ? R.rowLimits[gname] : R.rowLimits.default;
+    const limit = (R.rowLimits[gname] !== undefined ? R.rowLimits[gname] : R.rowLimits.default) || rows.length;
     for (const r of rows.slice(0, limit)) {
       const cats = [...r.cats].filter((c) => c !== "unknown").sort().join(", ") || "unclassified";
       add(`| \`${mdSafe(redactRid(r.rid))}\` | ${mdSafe(r.rtype)} | **${accessSummary(r.cats)}** | ${cats} | ${mdSafe(viaList(r.via))} ` +
@@ -769,7 +777,7 @@ function buildReport() {
     add("| Resource | Type | Mentions | Named in | Also accessed? |");
     add("|---|---|---|---|---|");
     memRows.sort((x, y) => y.mentions - x.mentions || cmp(x.rid, y.rid));
-    const limit = R.rowLimits.default;
+    const limit = R.rowLimits.default || memRows.length;
     for (const m of memRows.slice(0, limit)) {
       const accessed = RES.has(`${m.rtype} ${m.rid}`) ? "yes" : "not seen in access history";
       add(`| \`${mdSafe(redactRid(m.rid))}\` | ${mdSafe(m.rtype)} | ${m.mentions} | ${[...m.files].sort().map(mdSafe).join(", ")} | ${accessed} |`);
@@ -836,7 +844,7 @@ async function main() {
   const base = path.join(outDir, `agentic-access-report-${os.hostname().split(".")[0]}-${stamp}`);
   writeReport(base + ".md", buildReport());
   console.log(`\nReport written to: ${base}.md`);
-  if (!argv.includes("--no-json")) {
+  if (argv.includes("--json")) {
     const clean = (v) => (v instanceof Set ? [...v].sort() : v);
     const obj = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, clean(v)]));
     const j = { version: VERSION, platform: platformLine(),
@@ -849,7 +857,7 @@ async function main() {
                                                  group: resGroup(r.rtype),
                                                  reported: isReported(r.rtype) })) };
     writeReport(base + ".json", JSON.stringify(j, null, 1));
-    console.log(`Machine-readable copy:  ${base}.json  (send both files if asked to share)`);
+    console.log(`Machine-readable copy:  ${base}.json`);
   }
   console.log("Review the report, then share it manually if you choose to. Nothing was sent anywhere.");
 }

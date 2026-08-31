@@ -293,15 +293,20 @@ document.getElementById("lede").textContent =
   S.resources + " individual resources across " + S.machines + " machines. " +
   S.writeTypes + " of the " + S.types + " types saw changes rather than reads alone" +
   (S.admin || S.delete ? " \\u2014 including " + S.admin + " with admin actions and " + S.delete + " with deletes." : ".") +
-  " " + S.cliTypes + " of the " + S.types + " types were reached by a command-line tool with no MCP " +
-  "server anywhere in the path (" + S.cliResources + " resources, " + S.cliCalls + " calls), which is " +
-  "access no MCP-level tooling can see.";
+  " " + S.cliOnly + " of the " + S.types + " types were reached only by a command-line tool, with no " +
+  "MCP server anywhere in the path" +
+  (S.mixedTypes
+    ? ", and " + S.mixedTypes + " were reached both ways \u2014 a brokered path exists for those and is " +
+      "being bypassed alongside it"
+    : "") +
+  ". That is " + S.cliResources + " resources and " + S.cliCalls + " calls no MCP-level tooling can see.";
 
 const TILES = [
   ["types", "resource types reached", 0],
   ["resources", "individual resources", 0],
-  ["cliTypes", "types reached by direct CLI, no MCP server in the path", 2],
-  ["mcpTypes", "types reached through an MCP server", 0],
+  ["cliOnly", "types reached only by direct CLI, no MCP server in the path", 2],
+  ["mcpOnly", "types reached only through MCP servers", 0],
+  ["mixedTypes", "types reached both ways \u2014 a brokered path exists and is bypassed", 2],
   ["writeTypes", "types with changes", 0],
   ["severe", "resources with admin or delete", 1],
   ["shadow", "servers used but never configured", 0],
@@ -480,13 +485,23 @@ document.getElementById("foot").textContent = D.footer;
 </script>
 """
 
-cli_types = [t for t in types if "CLI" in t.get("paths", [])]
-mcp_types = [t for t in types if "MCP" in t.get("paths", [])]
+# CLI and MCP are not exclusive: a type -- or a single resource -- can be reached both ways, and
+# that mixed case is the most telling one. It means a brokered path exists and is being bypassed
+# for the same kind of resource, so adding governance does not automatically capture the traffic.
+def _paths(t): return set(t.get("paths", []))
+cli_only = [t for t in types if _paths(t) == {"CLI"}]
+mcp_only = [t for t in types if _paths(t) and "CLI" not in _paths(t)]
+mixed_types = [t for t in types if {"CLI", "MCP"} <= _paths(t)]
 cli_res = [r for r in res if any(t.startswith("CLI:") for t in r["tools"])]
+mixed_res = [r for r in res
+             if any(t.startswith("CLI:") for t in r["tools"])
+             and any(t.startswith("MCP:") for t in r["tools"])]
 
 summary = {
-    "cliTypes": len(cli_types), "mcpTypes": len(mcp_types),
-    "cliResources": len(cli_res), "cliCalls": sum(t["calls"] for t in cli_types),
+    "cliOnly": len(cli_only), "mcpOnly": len(mcp_only), "mixedTypes": len(mixed_types),
+    "mixedResources": len(mixed_res),
+    "cliResources": len(cli_res),
+    "cliCalls": sum(t["calls"] for t in cli_only) + sum(t["calls"] for t in mixed_types),
     "machines": len(machines), "types": n_types, "resources": n_res,
     "writeTypes": write_types, "covered": covered,
     "admin": admin_n, "delete": delete_n, "severe": admin_n + delete_n,

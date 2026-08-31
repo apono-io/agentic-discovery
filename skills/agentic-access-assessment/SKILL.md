@@ -103,10 +103,16 @@ The page is structured around the type view, in this order:
    across Y types; Z types saw writes; W are within Apono's coverage today. One sentence someone
    can repeat in a meeting.
 
-   Include the CLI/MCP split here and in the summary tiles, not only in the table: how many types
-   were reached by a command-line tool with no MCP server in the path. It is the number that decides
-   whether the customer's existing MCP-level controls see anything at all, so it belongs where
-   somebody who reads two lines will see it.
+   Include the CLI/MCP split here and in the summary tiles, not only in the table. It is the number
+   that decides whether the customer's existing MCP-level controls see anything at all, so it
+   belongs where somebody who reads two lines will see it.
+
+   Count it as three mutually exclusive buckets — CLI only, MCP only, and both — because CLI and MCP
+   are not alternatives: a resource type, or even a single resource, can be reached either way. Two
+   overlapping counts would sum to more than the number of types and quietly mislead. The **both**
+   bucket is the most interesting of the three and deserves saying out loud: a brokered path already
+   exists for that type and is being bypassed alongside it, which is the case where adding an
+   integration does not by itself capture the traffic.
 
 2. **Resource types as the primary table** — one row per type, sorted by call volume, each showing:
    coverage tier, how many distinct resources, how many machines, whether writes happened, total

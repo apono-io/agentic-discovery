@@ -71,7 +71,12 @@
       "execute",
       "run",
       "start",
-      "stop"
+      "stop",
+      "mute",
+      "silence",
+      "snooze",
+      "acknowledge",
+      "ack"
     ],
     "delete": [
       "delete",
@@ -227,6 +232,424 @@
           "type": "k8s"
         }
       ]
+    },
+    {
+      "keys": [
+        "image",
+        "image_name",
+        "repository"
+      ],
+      "whenServer": "docker",
+      "type": "container-image"
+    },
+    {
+      "keys": [
+        "workspace_id",
+        "workspace",
+        "organization"
+      ],
+      "whenServer": "terraform",
+      "type": "iac-terraform"
+    },
+    {
+      "keys": [
+        "site_id",
+        "siteId",
+        "deploy_id"
+      ],
+      "whenServer": "netlify",
+      "type": "netlify-site"
+    },
+    {
+      "keys": [
+        "project_id",
+        "projectId",
+        "deployment_id"
+      ],
+      "whenServer": "vercel",
+      "type": "vercel-project"
+    },
+    {
+      "keys": [
+        "zone_id",
+        "zoneId",
+        "account_id"
+      ],
+      "whenServer": "cloudflare",
+      "type": "cloudflare"
+    },
+    {
+      "keys": [
+        "meeting_id",
+        "transcript_id"
+      ],
+      "whenServer": "fireflies",
+      "type": "fireflies-meeting"
+    },
+    {
+      "keys": [
+        "guide_id",
+        "page_id"
+      ],
+      "whenServer": "pendo",
+      "type": "pendo-resource"
+    },
+    {
+      "keys": [
+        "project_id",
+        "chart_id"
+      ],
+      "whenServer": "amplitude",
+      "type": "amplitude-project"
+    },
+    {
+      "keys": [
+        "path",
+        "file_id"
+      ],
+      "whenServer": "dropbox",
+      "type": "dropbox-file"
+    },
+    {
+      "keys": [
+        "file_id",
+        "folder_id"
+      ],
+      "whenServer": "box_|^box$",
+      "type": "box-file"
+    },
+    {
+      "keys": [
+        "spreadsheet_id",
+        "spreadsheetId",
+        "sheet_id"
+      ],
+      "whenServer": "gsheet|google_sheet|googlesheet",
+      "type": "gsheet"
+    },
+    {
+      "keys": [
+        "calendar_id",
+        "calendarId",
+        "event_id"
+      ],
+      "whenServer": "gcal|google_calendar|googlecalendar",
+      "type": "gcal-calendar"
+    },
+    {
+      "keys": [
+        "message_id",
+        "thread_id",
+        "label_id"
+      ],
+      "whenServer": "gmail",
+      "type": "gmail-mailbox"
+    },
+    {
+      "keys": [
+        "file_id",
+        "fileId",
+        "folder_id"
+      ],
+      "whenServer": "gdrive|google_drive|googledrive",
+      "type": "gdrive-file"
+    },
+    {
+      "keys": [
+        "base_id",
+        "baseId",
+        "table_id",
+        "tableId"
+      ],
+      "whenServer": "airtable",
+      "type": "airtable-base"
+    },
+    {
+      "keys": [
+        "list_id",
+        "template_id"
+      ],
+      "whenServer": "sendgrid",
+      "type": "sendgrid-resource"
+    },
+    {
+      "keys": [
+        "account_sid",
+        "phone_number",
+        "message_sid"
+      ],
+      "whenServer": "twilio",
+      "type": "twilio-resource"
+    },
+    {
+      "keys": [
+        "shop",
+        "shop_domain",
+        "product_id",
+        "order_id"
+      ],
+      "whenServer": "shopify",
+      "type": "shopify-shop"
+    },
+    {
+      "keys": [
+        "customer",
+        "customer_id",
+        "subscription",
+        "charge_id",
+        "invoice"
+      ],
+      "whenServer": "stripe",
+      "type": "stripe-object"
+    },
+    {
+      "keys": [
+        "conversation_id",
+        "contact_id"
+      ],
+      "whenServer": "intercom",
+      "type": "intercom-conversation"
+    },
+    {
+      "keys": [
+        "ticket_id",
+        "organization_id"
+      ],
+      "whenServer": "zendesk",
+      "type": "zendesk-ticket"
+    },
+    {
+      "keys": [
+        "object_name",
+        "sobject",
+        "record_id"
+      ],
+      "whenServer": "salesforce",
+      "type": "salesforce-object"
+    },
+    {
+      "keys": [
+        "object_id",
+        "deal_id",
+        "contact_id",
+        "company_id"
+      ],
+      "whenServer": "hubspot",
+      "type": "hubspot-object"
+    },
+    {
+      "keys": [
+        "board_id"
+      ],
+      "whenServer": "miro",
+      "type": "miro-board"
+    },
+    {
+      "keys": [
+        "file_key",
+        "fileKey",
+        "node_id"
+      ],
+      "whenServer": "figma",
+      "type": "figma-file"
+    },
+    {
+      "keys": [
+        "task_id",
+        "list_id",
+        "space_id"
+      ],
+      "whenServer": "clickup",
+      "type": "clickup-task"
+    },
+    {
+      "keys": [
+        "task_gid",
+        "project_gid",
+        "workspace_gid"
+      ],
+      "whenServer": "asana",
+      "type": "asana-task"
+    },
+    {
+      "keys": [
+        "issue_id",
+        "team_id",
+        "project_id"
+      ],
+      "whenServer": "linear",
+      "type": "linear-issue"
+    },
+    {
+      "keys": [
+        "item_id",
+        "vault_id",
+        "vault"
+      ],
+      "whenServer": "1password|onepassword|op_",
+      "type": "onepassword-item"
+    },
+    {
+      "keys": [
+        "path",
+        "secret_path",
+        "mount"
+      ],
+      "whenServer": "vault|hashicorp",
+      "type": "vault-path"
+    },
+    {
+      "keys": [
+        "entity_guid",
+        "account_id"
+      ],
+      "whenServer": "newrelic|new_relic",
+      "type": "newrelic-entity"
+    },
+    {
+      "keys": [
+        "service_id",
+        "incident_id",
+        "escalation_policy_id"
+      ],
+      "whenServer": "pagerduty",
+      "type": "pagerduty-service"
+    },
+    {
+      "keys": [
+        "dashboard_uid",
+        "uid",
+        "datasource_uid"
+      ],
+      "whenServer": "grafana",
+      "type": "grafana-dashboard"
+    },
+    {
+      "keys": [
+        "monitor_id",
+        "dashboard_id",
+        "service"
+      ],
+      "whenServer": "datadog",
+      "type": "datadog"
+    },
+    {
+      "keys": [
+        "project_slug",
+        "project",
+        "issue_id",
+        "organization_slug"
+      ],
+      "whenServer": "sentry",
+      "type": "sentry-project"
+    },
+    {
+      "keys": [
+        "index"
+      ],
+      "whenServer": "splunk",
+      "type": "splunk-index"
+    },
+    {
+      "keys": [
+        "index"
+      ],
+      "whenServer": "elastic|elasticsearch",
+      "type": "elastic-index"
+    },
+    {
+      "keys": [
+        "database",
+        "branch"
+      ],
+      "whenServer": "planetscale",
+      "type": "planetscale-db"
+    },
+    {
+      "keys": [
+        "project_id",
+        "branch_id"
+      ],
+      "whenServer": "neon",
+      "type": "neon-project"
+    },
+    {
+      "keys": [
+        "project_id",
+        "project_ref"
+      ],
+      "whenServer": "supabase",
+      "type": "supabase-project"
+    },
+    {
+      "keys": [
+        "database",
+        "table"
+      ],
+      "whenServer": "mssql|sqlserver|sql_server",
+      "type": "mssql"
+    },
+    {
+      "keys": [
+        "database",
+        "table"
+      ],
+      "whenServer": "clickhouse",
+      "type": "clickhouse"
+    },
+    {
+      "keys": [
+        "dataset",
+        "dataset_id",
+        "table_id"
+      ],
+      "whenServer": "bigquery|big_query",
+      "type": "bigquery-dataset"
+    },
+    {
+      "keys": [
+        "key",
+        "db"
+      ],
+      "whenServer": "redis",
+      "type": "redis"
+    },
+    {
+      "keys": [
+        "project_id",
+        "report_id"
+      ],
+      "whenServer": "mixpanel",
+      "type": "mixpanel"
+    },
+    {
+      "keys": [
+        "app_id",
+        "appid",
+        "group_id",
+        "user_id"
+      ],
+      "whenServer": "okta",
+      "type": "okta"
+    },
+    {
+      "keys": [
+        "warehouse_id",
+        "cluster_id",
+        "catalog",
+        "job_id"
+      ],
+      "whenServer": "databricks",
+      "type": "databricks"
+    },
+    {
+      "keys": [
+        "collection",
+        "database",
+        "db"
+      ],
+      "whenServer": "mongo|mongodb",
+      "type": "mongodb"
     },
     {
       "keys": [
@@ -402,7 +825,9 @@
       "dl",
       "search",
       "ping",
-      "show"
+      "show",
+      "query",
+      "select"
     ],
     "create": [
       "create",
@@ -660,6 +1085,632 @@
       ]
     },
     {
+      "kind": "cloud",
+      "bin": "mongosh",
+      "via": "mongosh",
+      "regex": "\\bmongosh\\b[^\\n;|]*?((?:mongodb(?:\\+srv)?://|[\\w.-]+\\.[\\w.-]+/)[\\w.-]+)",
+      "type": "mongodb",
+      "rid": "$1",
+      "verbGroups": [],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "mongo",
+      "via": "mongo",
+      "regex": "\\bmongo\\s+((?:mongodb(?:\\+srv)?://)[^\\s\\\"']+)",
+      "type": "mongodb",
+      "rid": "$1",
+      "verbGroups": [],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "databricks",
+      "via": "databricks",
+      "regex": "\\bdatabricks\\s+([a-z][a-z-]*)\\s+([a-z][a-z-]*)",
+      "type": "databricks",
+      "rid": "databricks:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "submit",
+        "run-now",
+        "deploy"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "okta",
+      "via": "okta",
+      "regex": "\\bokta\\s+([a-z][a-z-]*)\\s+([a-z][a-z-]*)",
+      "type": "okta",
+      "rid": "okta:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "redis-cli",
+      "via": "redis-cli",
+      "regex": "\\bredis-cli\\b[^\\n;|]*?-h\\s+([\\w.-]+)",
+      "type": "redis",
+      "rid": "$1",
+      "verbGroups": [],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "bq",
+      "via": "bq",
+      "regex": "\\bbq\\s+(?:--\\S+\\s+)*([a-z][a-z-]*)\\b[^\\n;|]*?([\\w.-]+[:.][\\w.-]+)",
+      "type": "bigquery-dataset",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "load",
+        "insert",
+        "mk"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "clickhouse-client",
+      "via": "clickhouse",
+      "regex": "\\bclickhouse-client\\b[^\\n;|]*?(?:--host[= ]([\\w.-]+))",
+      "type": "clickhouse",
+      "rid": "$1",
+      "verbGroups": [],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "sqlcmd",
+      "via": "sqlcmd",
+      "regex": "\\bsqlcmd\\b[^\\n;|]*?-S\\s+([\\w.-]+)",
+      "type": "mssql",
+      "rid": "$1",
+      "verbGroups": [],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "mssql-cli",
+      "via": "mssql-cli",
+      "regex": "\\bmssql-cli\\b[^\\n;|]*?-S\\s+([\\w.-]+)",
+      "type": "mssql",
+      "rid": "$1",
+      "verbGroups": [],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "influx",
+      "via": "influx",
+      "regex": "\\binflux\\s+([a-z][a-z-]*)\\b[^\\n;|]*?(?:-b|--bucket)[= ]([\\w.-]+)",
+      "type": "influx-bucket",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "write"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "supabase",
+      "via": "supabase",
+      "regex": "\\bsupabase\\s+([a-z][a-z-]*)\\s+([a-z][a-z-]*)",
+      "type": "supabase-project",
+      "rid": "supabase:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "push",
+        "deploy"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "neonctl",
+      "via": "neonctl",
+      "regex": "\\bneonctl\\s+([a-z][a-z-]*)\\s+([a-z][a-z-]*)",
+      "type": "neon-project",
+      "rid": "neon:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "dbt",
+      "via": "dbt",
+      "regex": "\\bdbt\\s+(run|build|seed|snapshot|test|compile|docs|debug|deps)\\b",
+      "type": "dbt-project",
+      "rid": "dbt",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "run",
+        "build",
+        "seed",
+        "snapshot"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "terraform",
+      "via": "terraform",
+      "regex": "\\bterraform\\s+(plan|apply|destroy|import|state|refresh|output|show|validate|init|workspace)\\b",
+      "type": "iac-terraform",
+      "rid": "terraform",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "apply",
+        "import"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "terragrunt",
+      "via": "terragrunt",
+      "regex": "\\bterragrunt\\s+(plan|apply|destroy|import|state|output|init)\\b",
+      "type": "iac-terraform",
+      "rid": "terragrunt",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "apply",
+        "import"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "pulumi",
+      "via": "pulumi",
+      "regex": "\\bpulumi\\s+(up|preview|destroy|refresh|stack|config)\\b",
+      "type": "iac-pulumi",
+      "rid": "pulumi",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "up"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "helm",
+      "via": "helm",
+      "regex": "\\bhelm\\s+(install|upgrade|uninstall|rollback|list|status|get)\\s+([\\w.-]+)",
+      "type": "helm-release",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "install",
+        "upgrade",
+        "rollback"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "argocd",
+      "via": "argocd",
+      "regex": "\\bargocd\\s+app\\s+([a-z][a-z-]*)\\s+([\\w.-]+)",
+      "type": "argocd-app",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "sync",
+        "set",
+        "create"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "eksctl",
+      "via": "eksctl",
+      "regex": "\\beksctl\\s+([a-z][a-z-]*)\\s+(?:cluster|nodegroup)\\b[^\\n;|]*?(?:--name|--cluster)[= ]([\\w.-]+)",
+      "type": "k8s",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "docker",
+      "via": "docker",
+      "regex": "\\bdocker\\s+(push|pull)\\s+([\\w.\\-/]+(?::[\\w.-]+)?)",
+      "type": "container-image",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "push"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "podman",
+      "via": "podman",
+      "regex": "\\bpodman\\s+(push|pull)\\s+([\\w.\\-/]+(?::[\\w.-]+)?)",
+      "type": "container-image",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "push"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "skopeo",
+      "via": "skopeo",
+      "regex": "\\bskopeo\\s+(copy|inspect|delete)\\s+\\S*?([\\w.-]+\\.[\\w.-]+/[\\w.\\-/]+)",
+      "type": "container-image",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "copy"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "wrangler",
+      "via": "wrangler",
+      "regex": "\\bwrangler\\s+([a-z0-9][a-z0-9-]*)\\s+([a-z0-9][a-z0-9-]*)",
+      "type": "cloudflare",
+      "rid": "cloudflare:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "publish",
+        "deploy",
+        "put"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "vercel",
+      "via": "vercel",
+      "regex": "\\bvercel\\s+(deploy|env|domains|logs|list|ls|rollback|promote|alias)\\b",
+      "type": "vercel-project",
+      "rid": "vercel",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "deploy",
+        "promote",
+        "rollback"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "netlify",
+      "via": "netlify",
+      "regex": "\\bnetlify\\s+(deploy|env|sites|logs|open|status)\\b",
+      "type": "netlify-site",
+      "rid": "netlify",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "deploy"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "heroku",
+      "via": "heroku",
+      "regex": "\\bheroku\\s+([a-z:-]+)\\b[^\\n;|]*?(?:-a|--app)[= ]([\\w.-]+)",
+      "type": "heroku-app",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "restart",
+        "scale"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "doctl",
+      "via": "doctl",
+      "regex": "\\bdoctl\\s+([a-z][a-z-]*)\\s+([a-z][a-z-]*)",
+      "type": "digitalocean",
+      "rid": "do:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "flyctl",
+      "via": "flyctl",
+      "regex": "\\bflyctl\\s+([a-z][a-z-]*)\\b[^\\n;|]*?(?:-a|--app)[= ]([\\w.-]+)",
+      "type": "fly-app",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "deploy"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "gsutil",
+      "via": "gsutil",
+      "regex": "\\bgsutil\\s+([a-z][a-z-]*)\\b[^\\n;|]*?gs://([\\w.-]+)",
+      "type": "gcp",
+      "rid": "gs://$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "cp",
+        "rsync",
+        "mv"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "vault",
+      "via": "vault",
+      "regex": "\\bvault\\s+(?:kv\\s+)?([a-z][a-z-]*)\\s+((?:secret|kv|auth|sys|database)/[\\w.\\-/]+)",
+      "type": "vault-path",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "put",
+        "patch"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "op",
+      "via": "op",
+      "regex": "\\bop\\s+(item|document|vault|user|group)\\s+([a-z][a-z-]*)",
+      "type": "onepassword-item",
+      "rid": "1password:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "create",
+        "edit",
+        "share"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "tsh",
+      "via": "tsh",
+      "regex": "\\btsh\\s+(ssh|db|kube|apps|login|ls)\\s+(?:[\\w.-]+@)?([\\w.-]+)",
+      "type": "teleport-target",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "aws-vault",
+      "via": "aws-vault",
+      "regex": "\\baws-vault\\s+(exec|login|list|add|remove)\\s+([\\w.-]+)",
+      "type": "aws",
+      "rid": "aws:profile/$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "add"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "saml2aws",
+      "via": "saml2aws",
+      "regex": "\\bsaml2aws\\s+(login|exec|list-roles|configure)\\b",
+      "type": "aws",
+      "rid": "aws:federated-login",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "sentry-cli",
+      "via": "sentry",
+      "regex": "\\bsentry-cli\\s+([a-z][a-z-]*)\\b[^\\n;|]*?(?:-p|--project)[= ]([\\w.-]+)",
+      "type": "sentry-project",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "upload",
+        "set-commits",
+        "new",
+        "finalize",
+        "deploys"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "datadog-ci",
+      "via": "datadog",
+      "regex": "\\bdatadog-ci\\s+([a-z][a-z-]*)\\s+([a-z][a-z-]*)",
+      "type": "datadog",
+      "rid": "datadog:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "upload"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "stripe",
+      "via": "stripe",
+      "regex": "\\bstripe\\s+([a-z][a-z_]*)\\s+([a-z][a-z_]*)",
+      "type": "stripe-object",
+      "rid": "stripe:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "create",
+        "update",
+        "cancel"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "twilio",
+      "via": "twilio",
+      "regex": "\\btwilio\\s+api:([a-z0-9][a-z0-9:_-]*)\\s+([a-z]+)",
+      "type": "twilio-resource",
+      "rid": "twilio:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "create"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "sf",
+      "via": "sf",
+      "regex": "\\bsf\\s+([a-z][a-z-]*)\\s+([a-z][a-z-]*)",
+      "type": "salesforce-object",
+      "rid": "salesforce:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "deploy",
+        "push"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "sfdx",
+      "via": "sfdx",
+      "regex": "\\bsfdx\\s+(?:force:)?([a-z][a-z:_-]*)\\b",
+      "type": "salesforce-object",
+      "rid": "salesforce:$1",
+      "verbGroups": [],
+      "verbDefault": "get"
+    },
+    {
+      "kind": "cloud",
+      "bin": "shopify",
+      "via": "shopify",
+      "regex": "\\bshopify\\s+([a-z][a-z-]*)\\s+([a-z][a-z-]*)",
+      "type": "shopify-shop",
+      "rid": "shopify:$1",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "push",
+        "deploy"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "acli",
+      "via": "acli",
+      "regex": "\\bacli\\s+(?:jira|confluence)\\s+([a-z][a-z-]*)\\s+([a-z][a-z-]*)",
+      "type": "atlassian-site",
+      "rid": "atlassian (via acli)",
+      "verbGroups": [
+        2
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "create",
+        "update"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "gcalcli",
+      "via": "gcalcli",
+      "regex": "\\bgcalcli\\s+(agenda|list|add|delete|edit|search)\\b",
+      "type": "gcal-calendar",
+      "rid": "google-calendar",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "add",
+        "edit"
+      ]
+    },
+    {
       "kind": "curl",
       "bin": "curl",
       "via": "curl",
@@ -719,7 +1770,11 @@
   "browserServers": [
     "claude_in_chrome",
     "claude-in-chrome",
-    "claude_browser"
+    "claude_browser",
+    "playwright",
+    "puppeteer",
+    "browserbase",
+    "browser-use"
   ],
   "gatewayAliases": [
     "apono-agentic-local",
@@ -756,7 +1811,13 @@
       "gcp",
       "azure",
       "oci",
-      "k8s"
+      "k8s",
+      "cloudflare",
+      "digitalocean",
+      "fly-app",
+      "heroku-app",
+      "vercel-project",
+      "netlify-site"
     ],
     "Databases": [
       "postgres",
@@ -765,7 +1826,18 @@
       "db-schema",
       "db-table",
       "db-warehouse",
-      "snowflake"
+      "snowflake",
+      "mongodb",
+      "databricks",
+      "redis",
+      "bigquery-dataset",
+      "clickhouse",
+      "mssql",
+      "supabase-project",
+      "neon-project",
+      "planetscale-db",
+      "influx-bucket",
+      "dbt-project"
     ],
     "SaaS apps": [
       "atlassian-site",
@@ -779,7 +1851,30 @@
       "mixpanel",
       "okta",
       "notion-page",
-      "notion-database"
+      "notion-database",
+      "linear-issue",
+      "asana-task",
+      "clickup-task",
+      "figma-file",
+      "miro-board",
+      "hubspot-object",
+      "salesforce-object",
+      "zendesk-ticket",
+      "intercom-conversation",
+      "stripe-object",
+      "shopify-shop",
+      "twilio-resource",
+      "sendgrid-resource",
+      "airtable-base",
+      "gdrive-file",
+      "gmail-mailbox",
+      "gcal-calendar",
+      "gsheet",
+      "box-file",
+      "dropbox-file",
+      "amplitude-project",
+      "pendo-resource",
+      "fireflies-meeting"
     ],
     "Code hosting": [
       "github-repo",
@@ -796,6 +1891,27 @@
     ],
     "Brokered via Apono": [
       "apono-target"
+    ],
+    "Observability & incidents": [
+      "sentry-project",
+      "datadog",
+      "grafana-dashboard",
+      "pagerduty-service",
+      "newrelic-entity",
+      "elastic-index",
+      "splunk-index"
+    ],
+    "Secrets & identity": [
+      "vault-path",
+      "onepassword-item",
+      "teleport-target"
+    ],
+    "IaC & deployment": [
+      "iac-terraform",
+      "iac-pulumi",
+      "helm-release",
+      "argocd-app",
+      "container-image"
     ]
   },
   "reportGroups": [
@@ -806,6 +1922,9 @@
     "Artifact registries",
     "Web",
     "Brokered via Apono",
+    "Observability & incidents",
+    "Secrets & identity",
+    "IaC & deployment",
     "Other"
   ],
   "rowLimits": {
@@ -1344,6 +2463,246 @@
       "type": "gitlab-repo",
       "rid": "GitLab (project not named)",
       "serverPattern": "gitlab|GitLab"
+    },
+    {
+      "serverPattern": "mongo|mongodb",
+      "type": "mongodb",
+      "rid": "MongoDB (resource not named)"
+    },
+    {
+      "serverPattern": "databricks",
+      "type": "databricks",
+      "rid": "Databricks (resource not named)"
+    },
+    {
+      "serverPattern": "okta",
+      "type": "okta",
+      "rid": "Okta (resource not named)"
+    },
+    {
+      "serverPattern": "mixpanel",
+      "type": "mixpanel",
+      "rid": "Mixpanel (resource not named)"
+    },
+    {
+      "serverPattern": "redis",
+      "type": "redis",
+      "rid": "Redis (resource not named)"
+    },
+    {
+      "serverPattern": "bigquery|big_query",
+      "type": "bigquery-dataset",
+      "rid": "BigQuery (resource not named)"
+    },
+    {
+      "serverPattern": "clickhouse",
+      "type": "clickhouse",
+      "rid": "ClickHouse (resource not named)"
+    },
+    {
+      "serverPattern": "mssql|sqlserver|sql_server",
+      "type": "mssql",
+      "rid": "SQL Server (resource not named)"
+    },
+    {
+      "serverPattern": "supabase",
+      "type": "supabase-project",
+      "rid": "Supabase (resource not named)"
+    },
+    {
+      "serverPattern": "neon",
+      "type": "neon-project",
+      "rid": "Neon (resource not named)"
+    },
+    {
+      "serverPattern": "planetscale",
+      "type": "planetscale-db",
+      "rid": "PlanetScale (resource not named)"
+    },
+    {
+      "serverPattern": "elastic|elasticsearch",
+      "type": "elastic-index",
+      "rid": "Elasticsearch (resource not named)"
+    },
+    {
+      "serverPattern": "splunk",
+      "type": "splunk-index",
+      "rid": "Splunk (resource not named)"
+    },
+    {
+      "serverPattern": "sentry",
+      "type": "sentry-project",
+      "rid": "Sentry (resource not named)"
+    },
+    {
+      "serverPattern": "datadog",
+      "type": "datadog",
+      "rid": "Datadog (resource not named)"
+    },
+    {
+      "serverPattern": "grafana",
+      "type": "grafana-dashboard",
+      "rid": "Grafana (resource not named)"
+    },
+    {
+      "serverPattern": "pagerduty",
+      "type": "pagerduty-service",
+      "rid": "PagerDuty (resource not named)"
+    },
+    {
+      "serverPattern": "newrelic|new_relic",
+      "type": "newrelic-entity",
+      "rid": "New Relic (resource not named)"
+    },
+    {
+      "serverPattern": "vault|hashicorp",
+      "type": "vault-path",
+      "rid": "HashiCorp Vault (resource not named)"
+    },
+    {
+      "serverPattern": "1password|onepassword|op_",
+      "type": "onepassword-item",
+      "rid": "1Password (resource not named)"
+    },
+    {
+      "serverPattern": "linear",
+      "type": "linear-issue",
+      "rid": "Linear (resource not named)"
+    },
+    {
+      "serverPattern": "asana",
+      "type": "asana-task",
+      "rid": "Asana (resource not named)"
+    },
+    {
+      "serverPattern": "clickup",
+      "type": "clickup-task",
+      "rid": "ClickUp (resource not named)"
+    },
+    {
+      "serverPattern": "figma",
+      "type": "figma-file",
+      "rid": "Figma (resource not named)"
+    },
+    {
+      "serverPattern": "miro",
+      "type": "miro-board",
+      "rid": "Miro (resource not named)"
+    },
+    {
+      "serverPattern": "hubspot",
+      "type": "hubspot-object",
+      "rid": "HubSpot (resource not named)"
+    },
+    {
+      "serverPattern": "salesforce",
+      "type": "salesforce-object",
+      "rid": "Salesforce (resource not named)"
+    },
+    {
+      "serverPattern": "zendesk",
+      "type": "zendesk-ticket",
+      "rid": "Zendesk (resource not named)"
+    },
+    {
+      "serverPattern": "intercom",
+      "type": "intercom-conversation",
+      "rid": "Intercom (resource not named)"
+    },
+    {
+      "serverPattern": "stripe",
+      "type": "stripe-object",
+      "rid": "Stripe (resource not named)"
+    },
+    {
+      "serverPattern": "shopify",
+      "type": "shopify-shop",
+      "rid": "Shopify (resource not named)"
+    },
+    {
+      "serverPattern": "twilio",
+      "type": "twilio-resource",
+      "rid": "Twilio (resource not named)"
+    },
+    {
+      "serverPattern": "sendgrid",
+      "type": "sendgrid-resource",
+      "rid": "SendGrid (resource not named)"
+    },
+    {
+      "serverPattern": "airtable",
+      "type": "airtable-base",
+      "rid": "Airtable (resource not named)"
+    },
+    {
+      "serverPattern": "gdrive|google_drive|googledrive",
+      "type": "gdrive-file",
+      "rid": "Google Drive (resource not named)"
+    },
+    {
+      "serverPattern": "gmail",
+      "type": "gmail-mailbox",
+      "rid": "Gmail (resource not named)"
+    },
+    {
+      "serverPattern": "gcal|google_calendar|googlecalendar",
+      "type": "gcal-calendar",
+      "rid": "Google Calendar (resource not named)"
+    },
+    {
+      "serverPattern": "gsheet|google_sheet|googlesheet",
+      "type": "gsheet",
+      "rid": "Google Sheets (resource not named)"
+    },
+    {
+      "serverPattern": "box_|^box$",
+      "type": "box-file",
+      "rid": "Box (resource not named)"
+    },
+    {
+      "serverPattern": "dropbox",
+      "type": "dropbox-file",
+      "rid": "Dropbox (resource not named)"
+    },
+    {
+      "serverPattern": "amplitude",
+      "type": "amplitude-project",
+      "rid": "Amplitude (resource not named)"
+    },
+    {
+      "serverPattern": "pendo",
+      "type": "pendo-resource",
+      "rid": "Pendo (resource not named)"
+    },
+    {
+      "serverPattern": "fireflies",
+      "type": "fireflies-meeting",
+      "rid": "Fireflies (resource not named)"
+    },
+    {
+      "serverPattern": "cloudflare",
+      "type": "cloudflare",
+      "rid": "Cloudflare (resource not named)"
+    },
+    {
+      "serverPattern": "vercel",
+      "type": "vercel-project",
+      "rid": "Vercel (resource not named)"
+    },
+    {
+      "serverPattern": "netlify",
+      "type": "netlify-site",
+      "rid": "Netlify (resource not named)"
+    },
+    {
+      "serverPattern": "terraform",
+      "type": "iac-terraform",
+      "rid": "Terraform (resource not named)"
+    },
+    {
+      "serverPattern": "docker",
+      "type": "container-image",
+      "rid": "Docker (resource not named)"
     }
   ],
   "memoryScan": {
@@ -1450,7 +2809,24 @@
       "notion",
       "notion-page",
       "notion-database",
-      "slack-channel"
+      "slack-channel",
+      "linear-issue",
+      "asana-task",
+      "clickup-task",
+      "figma-file",
+      "miro-board",
+      "hubspot-object",
+      "salesforce-object",
+      "zendesk-ticket",
+      "intercom-conversation",
+      "airtable-base",
+      "gdrive-file",
+      "gmail-mailbox",
+      "gcal-calendar",
+      "gsheet",
+      "box-file",
+      "dropbox-file",
+      "sentry-project"
     ],
     "roadmap": [
       "azure",

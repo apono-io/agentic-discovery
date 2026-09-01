@@ -148,6 +148,34 @@ npm. That is the same publication decision as making the repo public — do it d
 `package.json` carries `"private": true` to prevent an accidental `npm publish` before that
 decision is made. Remove it when publishing is intended, and pin the version at the same time.
 
+## Tool coverage, and what still needs a product answer
+
+`js/rules.json` covers roughly 90 tools. Three mechanisms, in order of how much they buy:
+
+- **`shellRules`** — one entry per CLI, matched only when the binary is the first token of a real
+  command segment. Quoted text, heredocs and `grep` arguments never count, which is deliberate:
+  over-reporting access a customer did not have is the one error that discredits the whole report.
+- **`serviceRules` with `serverPattern`** — names the service when an MCP call names no specific
+  resource. This is the cheapest coverage there is: one line turns a wholly invisible server into a
+  named row.
+- **`keyRules` with `whenServer`** — extracts the actual resource id from call arguments.
+
+Adding a service means one entry in each, a type in `resourceGroups`, and a coverage tier.
+
+**These types have no coverage tier and render as "needs review":**
+
+amplitude-project, argocd-app, bigquery-dataset, clickhouse, cloudflare, container-image, datadog,
+dbt-project, digitalocean, elastic-index, fireflies-meeting, fly-app, grafana-dashboard,
+helm-release, heroku-app, iac-pulumi, iac-terraform, influx-bucket, mssql, neon-project,
+netlify-site, newrelic-entity, onepassword-item, pagerduty-service, pendo-resource,
+planetscale-db, redis, sendgrid-resource, shopify-shop, splunk-index, stripe-object,
+supabase-project, teleport-target, twilio-resource, vault-path, vercel-project
+
+That is not an oversight to tidy away. A tier is a product fact, and "needs review" is the honest
+label until someone who knows the integration catalog says otherwise. Vendors whose official MCP is
+OAuth-based were put in `oauthMcp`, since the catalog note already states that Apono's custom OAuth
+MCP support covers most OAuth MCP servers; anything less clear-cut was left untiered on purpose.
+
 ## Raising the identification rate
 
 Every report states what share of externally-reaching actions could be tied to a named resource.

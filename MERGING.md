@@ -6,13 +6,12 @@ Agentic Access Assessment you can put in front of a customer.
 ## 1. Ask participants to run the scan
 
 ```bash
-NPM_CONFIG_ALLOW_GIT=always npx -y github:apono-io/agentic-discovery
+curl -fsSL https://raw.githubusercontent.com/apono-io/agentic-discovery/main/agentic-discovery.cjs | node -
 ```
 
-That is the whole ask of a participant: one line, nothing installed, nothing left behind. The
-`NPM_CONFIG_ALLOW_GIT` prefix is needed because npm 12 refuses git-spec installs by default — send
-the line as-is rather than trimming it. Anyone who would rather read the code first can clone the
-repository and run `node js/discover.mjs`.
+That is the whole ask of a participant: one line, nothing installed, nothing left behind. Anyone who
+would rather read the code first can download it instead of piping it
+(`curl -fsSL -O https://raw.githubusercontent.com/apono-io/agentic-discovery/main/agentic-discovery.cjs` then `node agentic-discovery.cjs`), or clone the repository.
 
 They get one file — `agentic-access-report-<machine>-<date>.md` — which they read and send you.
 That single Markdown file is the complete input: every row is in it, nothing is truncated. (A

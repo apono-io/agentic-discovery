@@ -14,17 +14,22 @@ You need **Node.js 18 or newer** (check with `node --version`; if you don't have
 One command, nothing to install and nothing left behind:
 
 ```bash
-NPM_CONFIG_ALLOW_GIT=always npx -y github:apono-io/agentic-discovery
+curl -fsSL https://raw.githubusercontent.com/apono-io/agentic-discovery/main/agentic-discovery.cjs | node -
 ```
 
 On Windows PowerShell:
 
 ```powershell
-$env:NPM_CONFIG_ALLOW_GIT="always"; npx -y github:apono-io/agentic-discovery
+irm https://raw.githubusercontent.com/apono-io/agentic-discovery/main/agentic-discovery.cjs | node -
 ```
 
-(The `NPM_CONFIG_ALLOW_GIT` part is there because npm 12 refuses to install straight from a git
-repository unless you say it is fine. Nothing else about the command is unusual.)
+**Prefer to read it before you run it?** Reasonable — that is why the source is public. Same result,
+one extra step, and the file stays on disk for you to inspect:
+
+```bash
+curl -fsSL -O https://raw.githubusercontent.com/apono-io/agentic-discovery/main/agentic-discovery.cjs
+node agentic-discovery.cjs
+```
 
 It takes a few minutes, tells you the label your machine is reported under, and prints where it
 saved the report:
@@ -44,9 +49,9 @@ Open the report in any text editor, or preview it on macOS with:
 open agentic-access-report-*.md
 ```
 
-### Prefer to read the code first?
+### Or work from the repository
 
-Reasonable — it runs on your machine. Clone it, read it, then run it:
+If you would rather see the real sources rather than the single-file bundle:
 
 ```bash
 git clone https://github.com/apono-io/agentic-discovery.git

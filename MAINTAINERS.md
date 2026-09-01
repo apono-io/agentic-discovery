@@ -148,22 +148,26 @@ npm. That is the same publication decision as making the repo public — do it d
 `package.json` carries `"private": true` to prevent an accidental `npm publish` before that
 decision is made. Remove it when publishing is intended, and pin the version at the same time.
 
-## The npx one-liner and npm 12
+## The one-liner, and why it is not npx
 
-npm 12 ships `allow-git: none` and refuses git-spec installs. The `--allow-git=always` **flag is
-not wired up** — only the environment variable works — so the documented one-liner is:
+npm 12 refuses both git specs (`EALLOWGIT`) and remote tarballs (`EALLOWREMOTE`), and the
+`--allow-git` flag is not wired up -- only the environment variable is. So no npx form works from a
+repository. The documented one-liner therefore skips npm entirely:
 
 ```bash
-NPM_CONFIG_ALLOW_GIT=always npx -y github:apono-io/agentic-discovery
+curl -fsSL https://raw.githubusercontent.com/apono-io/agentic-discovery/main/agentic-discovery.cjs | node -
 ```
 
-Verified against the public repository on npm 12.0.2. Keep the prefix in every copy of the
-instruction; without it the command fails outright on current npm.
+It fetches `agentic-discovery.cjs`, the committed single-file bundle produced by
+`node build/bundle.mjs` with `js/rules.json` inlined. **Regenerate and commit the bundle in the same
+commit as any change to `js/discover.mjs` or `js/rules.json`** -- a stale bundle means the one-liner
+silently runs old rules. A CI check comparing the committed bundle against a fresh build is the
+obvious guard and does not exist yet.
 
-Publishing to the npm registry as `@apono-io/agentic-discovery` would remove the prefix and give a
-plain `npx @apono-io/agentic-discovery`. The scope already exists and is writable. It needs
-`"private": true` removed from `package.json` and a deliberate decision, since the licence is
-source-available rather than open source and an npm publish is effectively permanent.
+Publishing to the npm registry as `@apono-io/agentic-discovery` would allow a plain
+`npx @apono-io/agentic-discovery`. The name is free and the scope is writable, but it needs
+`"private": true` removed and a deliberate decision, since the licence is source-available and an
+npm publish is effectively permanent.
 
 ## Building and publishing
 

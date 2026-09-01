@@ -123,6 +123,7 @@ function cliCat(op, extraWrite = []) {
 // ---------------------------------------------------------------- data model
 const RES = new Map(), MCP = new Map(), AGENTS = new Map();
 const STATS = { external: 0, resolved: 0 };
+const UNRESOLVED = new Map();   // label -> count, for --unresolved
 const TYPE_GROUP = {};
 for (const [g, types] of Object.entries(R.resourceGroups)) for (const t of types) TYPE_GROUP[t] = g;
 const resGroup = (t) => TYPE_GROUP[t] || "Other";
@@ -143,10 +144,11 @@ function emit(rtype, rid, agent, via, tool, cat, ts) {
 /* Count one externally-reaching action, given the resource types it resolved to.
    Actions that resolve ONLY to non-reported groups (web browsing, code hosting)
    are left out of both numerator and denominator so the rate stays meaningful. */
-function countAction(types) {
+function countAction(types, label) {
   if (types.length && !types.some(isReported)) return;
   STATS.external++;
   if (types.some(isReported)) STATS.resolved++;
+  else if (label) UNRESOLVED.set(label, (UNRESOLVED.get(label) || 0) + 1);
 }
 function mcpRec(agent, server) {
   const k = `${agent} ${server}`;
@@ -347,7 +349,7 @@ function handleTool(agent, name, args, ts) {
     const dom = domainOf((args && args.url) || "");
     const types = [];
     if (dom) { const t = emit("web-domain", dom, agent, viaStr("builtin", name), name, "read", ts); if (t) types.push(t); }
-    countAction(types);
+    countAction(types, `builtin: ${name}`);
     return;
   }
   let server = null, tool = null;
@@ -376,7 +378,7 @@ function handleTool(agent, name, args, ts) {
       const dom = domainOf((args && args.url) || "");
       const types = [];
       if (dom) { const t = emit("web-domain", dom, agent, viaStr("builtin", `${server} > ${tool}`), tool, "read", ts); if (t) types.push(t); }
-      countAction(types);
+      countAction(types, `${server} > ${tool}`);
     }
     return;
   }
@@ -387,7 +389,7 @@ function handleTool(agent, name, args, ts) {
         const t = emit("web-domain", domainOf(v), agent, viaStr("browser", `${server} > ${tool}`), tool, "read", ts);
         if (t) types.push(t);
       }
-    countAction(types);
+    countAction(types, `${server} > ${tool}`);
     return;
   }
   if (R.gatewayAliases.includes(sl) && R.gatewayControlTools.includes(tool)) return;
@@ -406,7 +408,7 @@ function handleTool(agent, name, args, ts) {
       if (innerCat !== "unknown") cat = innerCat;
       if (raw && typeof raw === "object") {
         const types = extractArgs(raw, agent, viaStr("mcp", `${label} > ${innerTool}`).slice(0, 70), innerTool, cat, ts, server);
-        if (types.length) { countAction(types); return; }
+        if (types.length) { countAction(types, `${label} > ${innerTool}`); return; }
       }
     }
   }
@@ -419,7 +421,7 @@ function handleTool(agent, name, args, ts) {
                                       || (r.serverRx && r.serverRx.test(server)));
     if (sr) { const t = emit(sr.type, sr.rid, agent, via, innerTool, cat, ts); if (t) types.push(t); }
   }
-  countAction(types);
+  countAction(types, `${label} > ${innerTool}`);
 }
 
 // ---------------------------------------------------------------- host scanning (generic)
@@ -897,6 +899,16 @@ async function main() {
   writeReport(base + ".md", buildReport());
   console.log(`\nThis machine is reported as: ${machineLabel()}`);
   console.log(`Report written to: ${base}.md`);
+  if (argv.includes("--unresolved")) {
+    const rows = [...UNRESOLVED.entries()].sort((a, b) => b[1] - a[1]);
+    const tot = rows.reduce((n, [, c]) => n + c, 0);
+    console.log(`\nUnidentified externally-reaching actions: ${tot}`);
+    console.log("These reached something real but named no resource we could extract.");
+    console.log("The top rows are where new extraction rules would pay off most.\n");
+    for (const [lbl, c] of rows.slice(0, 25))
+      console.log(`  ${String(c).padStart(5)}  ${((c / tot) * 100).toFixed(1).padStart(5)}%  ${lbl}`);
+    if (rows.length > 25) console.log(`  ... and ${rows.length - 25} more`);
+  }
   if (argv.includes("--json")) {
     const clean = (v) => (v instanceof Set ? [...v].sort() : v);
     const obj = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, clean(v)]));

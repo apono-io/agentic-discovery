@@ -148,6 +148,26 @@ npm. That is the same publication decision as making the repo public — do it d
 `package.json` carries `"private": true` to prevent an accidental `npm publish` before that
 decision is made. Remove it when publishing is intended, and pin the version at the same time.
 
+## Raising the identification rate
+
+Every report states what share of externally-reaching actions could be tied to a named resource.
+To see what the rest actually were:
+
+```bash
+node agentic-discovery.cjs --unresolved
+```
+
+It prints the tools responsible for unidentified actions, biggest first, so a new extraction rule can
+be aimed at the largest share rather than guessed at. The flag is a maintainer diagnostic; it prints
+to the terminal and changes nothing in the report.
+
+Three shapes come up. A tool that takes no resource identifier at all (browser click-and-type
+automation, where the page is tab state rather than an argument) cannot be fixed by a rule. A tool
+whose target is implied by the session rather than the arguments (SQL through the gateway) needs
+either extraction from the payload or a service-level fallback. And control-plane calls to Apono
+itself are arguably not external access at all -- reclassifying those raises the rate by removing
+them from the denominator, which is honest only if they genuinely reach no customer resource.
+
 ## How SEs get the skill
 
 The repo root doubles as a Claude Code plugin: `.claude-plugin/plugin.json` is what makes

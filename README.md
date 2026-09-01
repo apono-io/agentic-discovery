@@ -24,7 +24,7 @@ saved the report:
     agentic-access-report-n___s~b0f-macbook-pro-<date>.md
 
 Computer names usually contain a person's name, so the report masks that part while keeping enough
-to recognise the machine — `Nufars-MacBook-Pro` becomes `n___s~b0f-macbook-pro`. Your full name is
+to recognise the machine — `asmith-MacBook-Pro` becomes `a___h~b0f-macbook-pro`. Your full name is
 not in the filename, the report, or anything built from it. (The short code after the `~` just keeps
 two similarly-named computers from being mistaken for each other.) If you would rather share the
 real name, run with `--no-redact`.

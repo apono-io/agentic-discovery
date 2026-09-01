@@ -72,7 +72,7 @@ on and invites the reader to distrust both.
 
 What the scanner does by default: a hostname is usually `<person>-<model>`, so it masks the person
 segment while keeping its first and last letter and appends a short salted code —
-`Nufars-MacBook-Pro` becomes `n___s~b0f-macbook-pro`. That is deliberately pseudonymous rather than
+`asmith-MacBook-Pro` becomes `a___h~b0f-macbook-pro`. That is deliberately pseudonymous rather than
 anonymous. A colleague who knows the team can tell whose machine it is, which is the point: an SE
 needs to ask that person a follow-up question, and a customer needs to match a label to an asset.
 Generic prefixes like `DESKTOP-A1B2C3` are left alone, since there is no name in them to hide.

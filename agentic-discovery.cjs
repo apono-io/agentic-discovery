@@ -2,7 +2,7 @@
 /* GENERATED FILE -- do not edit. Built from js/discover.mjs + js/rules.json
    by build/bundle.mjs. Edit those and rebuild. */
 /*
- * Agentic Access Discovery -- per-machine report (JS runner v0.8)
+ * Agentic Access Discovery -- per-machine report (JS runner v0.9)
  *
  * One codebase, two channels:
  *   Node:    node discover.mjs   (or: npx @apono-io/agentic-discovery)
@@ -19,10 +19,10 @@ const path = require("node:path");
 const os = require("node:os");
 const crypto = require("node:crypto");
 
-const VERSION = "0.8";
+const VERSION = "0.9";
 const HOME = os.homedir();
 const R = {
-  "rulesVersion": "0.8",
+  "rulesVersion": "0.9",
   "verbOrder": [
     "admin",
     "delete",
@@ -223,6 +223,36 @@ const R = {
     },
     {
       "keys": [
+        "repo_key",
+        "repository_key",
+        "repokey",
+        "repo",
+        "repository"
+      ],
+      "type": "jfrog-repo",
+      "whenServer": "jfrog|JFrog|artifactory|Artifactory"
+    },
+    {
+      "keys": [
+        "project_id",
+        "project_path",
+        "projectid",
+        "namespace",
+        "namespace_path"
+      ],
+      "type": "gitlab-repo",
+      "whenServer": "gitlab|GitLab"
+    },
+    {
+      "keys": [
+        "group_id",
+        "group_path"
+      ],
+      "type": "gitlab-group",
+      "whenServer": "gitlab|GitLab"
+    },
+    {
+      "keys": [
         "repo",
         "repository"
       ],
@@ -313,7 +343,12 @@ const R = {
       "describe",
       "get",
       "list",
-      "ls"
+      "ls",
+      "download",
+      "dl",
+      "search",
+      "ping",
+      "show"
     ],
     "create": [
       "create",
@@ -479,6 +514,98 @@ const R = {
       "regex": "\\bgit\\b[^\\n;|]*\\b(clone|push|pull|fetch)\\b[^\\n;|]*?((?:https?://|git@)[^\\s\"']+)"
     },
     {
+      "kind": "cloud",
+      "bin": "glab",
+      "via": "glab",
+      "regex": "\\bglab\\s+(?:mr|issue|repo|api|release|ci|variable)\\s+([a-z-]+)?[^\\n;|]*?(?:(?:-R|--repo)[= ]([\\w.-]+(?:/[\\w.-]+)+)|projects/([\\w.%-]+(?:/[\\w.-]+)*))",
+      "type": "gitlab-repo",
+      "rid": "$2||$3",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "merge",
+        "comment",
+        "note",
+        "approve"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "jf",
+      "via": "jf",
+      "type": "jfrog-repo",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "regex": "\\bjf\\s+(?:rt|artifactory)\\s+(download|dl|search|s|delete|del|copy|cp|move|mv|set-props|sp)\\b[^\\n;|]*?\\b([a-z][\\w.-]*)/",
+      "extraWrite": [
+        "copy",
+        "cp",
+        "move",
+        "mv",
+        "set-props",
+        "sp"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "jf",
+      "via": "jf",
+      "type": "jfrog-repo",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "regex": "\\bjf\\s+(?:rt|artifactory)\\s+(upload|u|deploy)\\b[^\\n;|]*\\s([a-z][\\w.-]*)/",
+      "extraWrite": [
+        "upload",
+        "u",
+        "deploy"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "jfrog",
+      "via": "jfrog",
+      "type": "jfrog-repo",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "regex": "\\bjfrog\\s+(?:rt|artifactory)\\s+(download|dl|search|s|delete|del|copy|cp|move|mv|set-props|sp)\\b[^\\n;|]*?\\b([a-z][\\w.-]*)/",
+      "extraWrite": [
+        "copy",
+        "cp",
+        "move",
+        "mv",
+        "set-props",
+        "sp"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "jfrog",
+      "via": "jfrog",
+      "type": "jfrog-repo",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "regex": "\\bjfrog\\s+(?:rt|artifactory)\\s+(upload|u|deploy)\\b[^\\n;|]*\\s([a-z][\\w.-]*)/",
+      "extraWrite": [
+        "upload",
+        "u",
+        "deploy"
+      ]
+    },
+    {
       "kind": "curl",
       "bin": "curl",
       "via": "curl",
@@ -596,19 +723,26 @@ const R = {
     "Code hosting": [
       "github-repo",
       "github-org",
+      "gitlab-repo",
+      "gitlab-group",
       "git-remote"
     ],
     "Web": [
       "web-domain"
+    ],
+    "Artifact registries": [
+      "jfrog-repo"
     ]
   },
   "reportGroups": [
     "Cloud",
     "Databases",
     "SaaS apps",
+    "Code hosting",
+    "Artifact registries",
+    "Web",
     "Other"
   ],
-  "excludedGroupsNote": "General web browsing and code-hosting (GitHub/git) access are collected but not reported here, by configuration.",
   "rowLimits": {
     "default": 0,
     "note": "0 = no limit. The Markdown report is the only artifact we can rely on receiving, so it must contain every row."
@@ -1135,6 +1269,16 @@ const R = {
       "toolPattern": "^knowledge_",
       "type": "knowledge-collection",
       "rid": "knowledge (collection not named)"
+    },
+    {
+      "type": "jfrog-repo",
+      "rid": "JFrog Artifactory (repo not named)",
+      "serverPattern": "jfrog|JFrog|artifactory|Artifactory"
+    },
+    {
+      "type": "gitlab-repo",
+      "rid": "GitLab (project not named)",
+      "serverPattern": "gitlab|GitLab"
     }
   ],
   "memoryScan": {
@@ -1196,6 +1340,16 @@ const R = {
       {
         "type": "slack-channel",
         "regex": "(?:^|\\s)#([a-z0-9][a-z0-9._-]{2,40})\\b",
+        "group": 1
+      },
+      {
+        "type": "gitlab-repo",
+        "regex": "gitlab\\.com/([\\w.-]+(?:/[\\w.-]+)+?)(?:[/)\\s.]|$)",
+        "group": 1
+      },
+      {
+        "type": "jfrog-repo",
+        "regex": "[\\w-]+\\.jfrog\\.io/(?:artifactory/)?([\\w.-]+)",
         "group": 1
       }
     ],
@@ -1411,13 +1565,16 @@ function walkObj(d, out) {
 const normKey = (k) => String(k).toLowerCase().replace(/[_-]/g, "");
 const KEY_RULES = R.keyRules.map((r) => ({ ...r, normKeys: r.keys.map(normKey),
                                            toolRx: r.whenTool ? new RegExp(r.whenTool) : null,
+                                           serverRx: r.whenServer ? new RegExp(r.whenServer) : null,
                                            extractRx: r.valueExtract ? new RegExp(r.valueExtract) : null }));
-const SERVICE_RULES = (R.serviceRules || []).map((r) => ({ ...r, rx: new RegExp(r.toolPattern) }));
+const SERVICE_RULES = (R.serviceRules || []).map((r) => ({ ...r,
+                                           rx: r.toolPattern ? new RegExp(r.toolPattern) : null,
+                                           serverRx: r.serverPattern ? new RegExp(r.serverPattern) : null }));
 const FINGERPRINTS = (R.connectorFingerprints || []).map((f) => ({ ...f, rx: new RegExp(f.toolPattern) }));
 const CONNECTOR_NAMES = new Map();
 
 /* Returns the list of resource types emitted (empty = nothing resolved). */
-function extractArgs(args, agent, via, tool, cat, ts) {
+function extractArgs(args, agent, via, tool, cat, ts, server = "") {
   const flat = []; walkObj(args, flat); const types = [];
   for (const [k, v] of flat) {
     if (v === null || v === undefined || v === "") continue;
@@ -1427,7 +1584,9 @@ function extractArgs(args, agent, via, tool, cat, ts) {
       if (m) { const t = emit("jira-project", m[1], agent, via, tool, cat, ts); if (t) types.push(t); continue; }
     }
     const nk = normKey(kl);
-    const rule = KEY_RULES.find((r) => (!r.toolRx || r.toolRx.test(tool)) && r.normKeys.includes(nk));
+    const rule = KEY_RULES.find((r) => (!r.toolRx || r.toolRx.test(tool))
+                                    && (!r.serverRx || r.serverRx.test(server))
+                                    && r.normKeys.includes(nk));
     if (rule) {
       let val = vs;
       if (rule.extractRx) {                    // e.g. pull a page id out of a full URL
@@ -1631,17 +1790,18 @@ function handleTool(agent, name, args, ts) {
       const innerCat = categorize(innerTool, raw && typeof raw === "object" ? raw : {});
       if (innerCat !== "unknown") cat = innerCat;
       if (raw && typeof raw === "object") {
-        const types = extractArgs(raw, agent, viaStr("mcp", `${label} > ${innerTool}`).slice(0, 70), innerTool, cat, ts);
+        const types = extractArgs(raw, agent, viaStr("mcp", `${label} > ${innerTool}`).slice(0, 70), innerTool, cat, ts, server);
         if (types.length) { countAction(types); return; }
       }
     }
   }
   const via = viaStr("mcp", `${label} > ${innerTool}`).slice(0, 70);
   const types = (args && typeof args === "object")
-    ? extractArgs(args, agent, via, innerTool, cat, ts)
+    ? extractArgs(args, agent, via, innerTool, cat, ts, server)
     : [];
   if (!types.length) {                 // reached a known service, named no specific resource
-    const sr = SERVICE_RULES.find((r) => r.rx.test(innerTool));
+    const sr = SERVICE_RULES.find((r) => (r.rx && r.rx.test(innerTool))
+                                      || (r.serverRx && r.serverRx.test(server)));
     if (sr) { const t = emit(sr.type, sr.rid, agent, via, innerTool, cat, ts); if (t) types.push(t); }
   }
   countAction(types);
@@ -2067,7 +2227,9 @@ function buildReport() {
     add(`- ${RD.note.replace("{keepLast}", String(RD.keepLast || 4))}`);
   if (REDACT && SALT_BASIS === "organization domain" && RD.defaultSalt && RD.defaultSalt.note)
     add(`- ${RD.defaultSalt.note}`);
-  add(`- ${R.excludedGroupsNote}`);
+  const notReported = Object.keys(R.resourceGroups).filter((g) => !R.reportGroups.includes(g));
+  if (notReported.length)
+    add(`- Collected but not reported here, by configuration: ${notReported.join(", ")}.`);
   if (isWsl())
     add("- This WSL scan covered the Linux filesystem and the Windows user profiles listed above. " +
         "A Windows-side scan cannot see other WSL distros; run the tool inside each distro that has agent activity.");

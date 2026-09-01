@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Agentic Access Discovery -- per-machine report (JS runner v0.8)
+ * Agentic Access Discovery -- per-machine report (JS runner v0.9)
  *
  * One codebase, two channels:
  *   Node:    node discover.mjs   (or: npx @apono-io/agentic-discovery)
@@ -17,7 +17,7 @@ import path from "node:path";
 import os from "node:os";
 import crypto from "node:crypto";
 
-const VERSION = "0.8";
+const VERSION = "0.9";
 const HOME = os.homedir();
 const R = JSON.parse(fs.readFileSync(new URL("./rules.json", import.meta.url), "utf-8"));
 
@@ -180,13 +180,16 @@ function walkObj(d, out) {
 const normKey = (k) => String(k).toLowerCase().replace(/[_-]/g, "");
 const KEY_RULES = R.keyRules.map((r) => ({ ...r, normKeys: r.keys.map(normKey),
                                            toolRx: r.whenTool ? new RegExp(r.whenTool) : null,
+                                           serverRx: r.whenServer ? new RegExp(r.whenServer) : null,
                                            extractRx: r.valueExtract ? new RegExp(r.valueExtract) : null }));
-const SERVICE_RULES = (R.serviceRules || []).map((r) => ({ ...r, rx: new RegExp(r.toolPattern) }));
+const SERVICE_RULES = (R.serviceRules || []).map((r) => ({ ...r,
+                                           rx: r.toolPattern ? new RegExp(r.toolPattern) : null,
+                                           serverRx: r.serverPattern ? new RegExp(r.serverPattern) : null }));
 const FINGERPRINTS = (R.connectorFingerprints || []).map((f) => ({ ...f, rx: new RegExp(f.toolPattern) }));
 const CONNECTOR_NAMES = new Map();
 
 /* Returns the list of resource types emitted (empty = nothing resolved). */
-function extractArgs(args, agent, via, tool, cat, ts) {
+function extractArgs(args, agent, via, tool, cat, ts, server = "") {
   const flat = []; walkObj(args, flat); const types = [];
   for (const [k, v] of flat) {
     if (v === null || v === undefined || v === "") continue;
@@ -196,7 +199,9 @@ function extractArgs(args, agent, via, tool, cat, ts) {
       if (m) { const t = emit("jira-project", m[1], agent, via, tool, cat, ts); if (t) types.push(t); continue; }
     }
     const nk = normKey(kl);
-    const rule = KEY_RULES.find((r) => (!r.toolRx || r.toolRx.test(tool)) && r.normKeys.includes(nk));
+    const rule = KEY_RULES.find((r) => (!r.toolRx || r.toolRx.test(tool))
+                                    && (!r.serverRx || r.serverRx.test(server))
+                                    && r.normKeys.includes(nk));
     if (rule) {
       let val = vs;
       if (rule.extractRx) {                    // e.g. pull a page id out of a full URL
@@ -400,17 +405,18 @@ function handleTool(agent, name, args, ts) {
       const innerCat = categorize(innerTool, raw && typeof raw === "object" ? raw : {});
       if (innerCat !== "unknown") cat = innerCat;
       if (raw && typeof raw === "object") {
-        const types = extractArgs(raw, agent, viaStr("mcp", `${label} > ${innerTool}`).slice(0, 70), innerTool, cat, ts);
+        const types = extractArgs(raw, agent, viaStr("mcp", `${label} > ${innerTool}`).slice(0, 70), innerTool, cat, ts, server);
         if (types.length) { countAction(types); return; }
       }
     }
   }
   const via = viaStr("mcp", `${label} > ${innerTool}`).slice(0, 70);
   const types = (args && typeof args === "object")
-    ? extractArgs(args, agent, via, innerTool, cat, ts)
+    ? extractArgs(args, agent, via, innerTool, cat, ts, server)
     : [];
   if (!types.length) {                 // reached a known service, named no specific resource
-    const sr = SERVICE_RULES.find((r) => r.rx.test(innerTool));
+    const sr = SERVICE_RULES.find((r) => (r.rx && r.rx.test(innerTool))
+                                      || (r.serverRx && r.serverRx.test(server)));
     if (sr) { const t = emit(sr.type, sr.rid, agent, via, innerTool, cat, ts); if (t) types.push(t); }
   }
   countAction(types);
@@ -836,7 +842,9 @@ function buildReport() {
     add(`- ${RD.note.replace("{keepLast}", String(RD.keepLast || 4))}`);
   if (REDACT && SALT_BASIS === "organization domain" && RD.defaultSalt && RD.defaultSalt.note)
     add(`- ${RD.defaultSalt.note}`);
-  add(`- ${R.excludedGroupsNote}`);
+  const notReported = Object.keys(R.resourceGroups).filter((g) => !R.reportGroups.includes(g));
+  if (notReported.length)
+    add(`- Collected but not reported here, by configuration: ${notReported.join(", ")}.`);
   if (isWsl())
     add("- This WSL scan covered the Linux filesystem and the Windows user profiles listed above. " +
         "A Windows-side scan cannot see other WSL distros; run the tool inside each distro that has agent activity.");

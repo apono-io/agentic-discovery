@@ -1,5 +1,5 @@
 {
-  "rulesVersion": "0.8",
+  "rulesVersion": "0.9",
   "verbOrder": [
     "admin",
     "delete",
@@ -200,6 +200,36 @@
     },
     {
       "keys": [
+        "repo_key",
+        "repository_key",
+        "repokey",
+        "repo",
+        "repository"
+      ],
+      "type": "jfrog-repo",
+      "whenServer": "jfrog|JFrog|artifactory|Artifactory"
+    },
+    {
+      "keys": [
+        "project_id",
+        "project_path",
+        "projectid",
+        "namespace",
+        "namespace_path"
+      ],
+      "type": "gitlab-repo",
+      "whenServer": "gitlab|GitLab"
+    },
+    {
+      "keys": [
+        "group_id",
+        "group_path"
+      ],
+      "type": "gitlab-group",
+      "whenServer": "gitlab|GitLab"
+    },
+    {
+      "keys": [
         "repo",
         "repository"
       ],
@@ -290,7 +320,12 @@
       "describe",
       "get",
       "list",
-      "ls"
+      "ls",
+      "download",
+      "dl",
+      "search",
+      "ping",
+      "show"
     ],
     "create": [
       "create",
@@ -456,6 +491,98 @@
       "regex": "\\bgit\\b[^\\n;|]*\\b(clone|push|pull|fetch)\\b[^\\n;|]*?((?:https?://|git@)[^\\s\"']+)"
     },
     {
+      "kind": "cloud",
+      "bin": "glab",
+      "via": "glab",
+      "regex": "\\bglab\\s+(?:mr|issue|repo|api|release|ci|variable)\\s+([a-z-]+)?[^\\n;|]*?(?:(?:-R|--repo)[= ]([\\w.-]+(?:/[\\w.-]+)+)|projects/([\\w.%-]+(?:/[\\w.-]+)*))",
+      "type": "gitlab-repo",
+      "rid": "$2||$3",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "extraWrite": [
+        "merge",
+        "comment",
+        "note",
+        "approve"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "jf",
+      "via": "jf",
+      "type": "jfrog-repo",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "regex": "\\bjf\\s+(?:rt|artifactory)\\s+(download|dl|search|s|delete|del|copy|cp|move|mv|set-props|sp)\\b[^\\n;|]*?\\b([a-z][\\w.-]*)/",
+      "extraWrite": [
+        "copy",
+        "cp",
+        "move",
+        "mv",
+        "set-props",
+        "sp"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "jf",
+      "via": "jf",
+      "type": "jfrog-repo",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "regex": "\\bjf\\s+(?:rt|artifactory)\\s+(upload|u|deploy)\\b[^\\n;|]*\\s([a-z][\\w.-]*)/",
+      "extraWrite": [
+        "upload",
+        "u",
+        "deploy"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "jfrog",
+      "via": "jfrog",
+      "type": "jfrog-repo",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "regex": "\\bjfrog\\s+(?:rt|artifactory)\\s+(download|dl|search|s|delete|del|copy|cp|move|mv|set-props|sp)\\b[^\\n;|]*?\\b([a-z][\\w.-]*)/",
+      "extraWrite": [
+        "copy",
+        "cp",
+        "move",
+        "mv",
+        "set-props",
+        "sp"
+      ]
+    },
+    {
+      "kind": "cloud",
+      "bin": "jfrog",
+      "via": "jfrog",
+      "type": "jfrog-repo",
+      "rid": "$2",
+      "verbGroups": [
+        1
+      ],
+      "verbDefault": "get",
+      "regex": "\\bjfrog\\s+(?:rt|artifactory)\\s+(upload|u|deploy)\\b[^\\n;|]*\\s([a-z][\\w.-]*)/",
+      "extraWrite": [
+        "upload",
+        "u",
+        "deploy"
+      ]
+    },
+    {
       "kind": "curl",
       "bin": "curl",
       "via": "curl",
@@ -573,19 +700,26 @@
     "Code hosting": [
       "github-repo",
       "github-org",
+      "gitlab-repo",
+      "gitlab-group",
       "git-remote"
     ],
     "Web": [
       "web-domain"
+    ],
+    "Artifact registries": [
+      "jfrog-repo"
     ]
   },
   "reportGroups": [
     "Cloud",
     "Databases",
     "SaaS apps",
+    "Code hosting",
+    "Artifact registries",
+    "Web",
     "Other"
   ],
-  "excludedGroupsNote": "General web browsing and code-hosting (GitHub/git) access are collected but not reported here, by configuration.",
   "rowLimits": {
     "default": 0,
     "note": "0 = no limit. The Markdown report is the only artifact we can rely on receiving, so it must contain every row."
@@ -1112,6 +1246,16 @@
       "toolPattern": "^knowledge_",
       "type": "knowledge-collection",
       "rid": "knowledge (collection not named)"
+    },
+    {
+      "type": "jfrog-repo",
+      "rid": "JFrog Artifactory (repo not named)",
+      "serverPattern": "jfrog|JFrog|artifactory|Artifactory"
+    },
+    {
+      "type": "gitlab-repo",
+      "rid": "GitLab (project not named)",
+      "serverPattern": "gitlab|GitLab"
     }
   ],
   "memoryScan": {
@@ -1173,6 +1317,16 @@
       {
         "type": "slack-channel",
         "regex": "(?:^|\\s)#([a-z0-9][a-z0-9._-]{2,40})\\b",
+        "group": 1
+      },
+      {
+        "type": "gitlab-repo",
+        "regex": "gitlab\\.com/([\\w.-]+(?:/[\\w.-]+)+?)(?:[/)\\s.]|$)",
+        "group": 1
+      },
+      {
+        "type": "jfrog-repo",
+        "regex": "[\\w-]+\\.jfrog\\.io/(?:artifactory/)?([\\w.-]+)",
         "group": 1
       }
     ],

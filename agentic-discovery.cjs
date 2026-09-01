@@ -1476,7 +1476,10 @@ const R = {
       "slack-channel"
     ],
     "roadmap": [
-      "azure"
+      "azure",
+      "gitlab-repo",
+      "gitlab-group",
+      "jfrog-repo"
     ],
     "unsupported": [
       "gcp",
@@ -1491,7 +1494,7 @@ const R = {
       "unsupported": "not supported",
       "unknown": "needs review"
     },
-    "note": "Catalog status as of 2026-08-31: AWS and Kubernetes GA; PostgreSQL, MySQL, MongoDB, Snowflake and Databricks GA; native Atlassian, GitHub, monday.com, Mixpanel and Okta integrations. Anything marked 'supported via custom OAuth MCP' is reachable through Apono's custom OAuth MCP support, which covers most OAuth MCP servers (unauthenticated, dynamic client registration, and client-ID authentication). This is a PRODUCT FACT THAT CHANGES -- re-check it against the current integration catalog before putting an assessment in front of a customer."
+    "note": "Catalog status as of 2026-08-31: AWS and Kubernetes GA; PostgreSQL, MySQL, MongoDB, Snowflake and Databricks GA; native Atlassian, GitHub, monday.com, Mixpanel and Okta integrations; Azure, GitLab and JFrog Artifactory on the roadmap. Anything marked 'supported via custom OAuth MCP' is reachable through Apono's custom OAuth MCP support, which covers most OAuth MCP servers (unauthenticated, dynamic client registration, and client-ID authentication). This is a PRODUCT FACT THAT CHANGES -- re-check it against the current integration catalog before putting an assessment in front of a customer."
   }
 };
 

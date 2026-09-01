@@ -12,3 +12,6 @@ dist/
 build/.work/
 agentic-access-assessment-*
 Reports/
+
+# the single-file bundle IS committed on purpose -- it is what the one-liner fetches
+!agentic-discovery.cjs

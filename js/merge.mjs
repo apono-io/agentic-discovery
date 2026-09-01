@@ -457,6 +457,9 @@ function main() {
       unresolved: [...merged.unres.values()]
         .sort((a, b) => b.calls - a.calls)
         .map((u) => ({ tool: u.tool, calls: u.calls, machines: u.machines.size })),
+      // how many machines contributed at all -- only v0.9+ reports carry the section
+      unresolvedMachines: new Set(
+        [...merged.unres.values()].flatMap((u) => [...u.machines])).size,
       machines: reports.map((r) => ({ machine: r.machine, generated: r.generated[0],
                                       idRate: r.idRate,
                                       version: r.version, saltBasis: r.saltBasis,

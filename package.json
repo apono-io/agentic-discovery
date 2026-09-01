@@ -8,12 +8,13 @@
     "agentic-discovery-merge": "js/merge.mjs"
   },
   "files": [
+    "LICENSE",
+    "MERGING.md",
+    "README.md",
+    "SECURITY-AUDIT.md",
     "js/discover.mjs",
     "js/merge.mjs",
-    "js/rules.json",
-    "README.md",
-    "MERGING.md",
-    "SECURITY-AUDIT.md"
+    "js/rules.json"
   ],
   "engines": {
     "node": ">=18"
@@ -22,6 +23,6 @@
     "type": "git",
     "url": "git+https://github.com/apono-io/agentic-discovery.git"
   },
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "private": true
 }

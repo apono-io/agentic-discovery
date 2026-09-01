@@ -1,0 +1,56 @@
+Copyright (c) 2026 Apono Ltd., a 1Password company. All rights reserved.
+
+THIS IS NOT OPEN SOURCE SOFTWARE. The source is published so that anyone asked to run
+it can read exactly what it does before running it. Publication is not a grant of the
+rights an open-source licence would give you.
+
+1. PERMITTED USE
+
+   You may:
+
+   (a) read, review, audit and analyse this source code, including for the purpose of
+       satisfying yourself or your organisation that it is safe to run;
+
+   (b) run it on computers you own or are authorised to administer, for the sole purpose
+       of producing an Agentic Access Report or Agentic Access Assessment about those
+       computers ("the Intended Use"); and
+
+   (c) make and keep copies to the extent necessary to do (a) and (b).
+
+2. RESERVED RIGHTS
+
+   All other rights are reserved to Apono Ltd. Without prior written permission from
+   Apono Ltd. you may not:
+
+   (a) use this software, in whole or in part, for any purpose other than the Intended
+       Use;
+
+   (b) redistribute, publish, sublicense, sell, rent or otherwise make it available to
+       third parties;
+
+   (c) modify it, or create or distribute derivative works, other than local changes made
+       solely to accomplish the Intended Use on your own computers;
+
+   (d) incorporate it, or any part of it, into another product, service or offering,
+       whether commercial or not; or
+
+   (e) use it to build, evaluate or improve a competing product, or remove or obscure the
+       copyright and licence notices in it.
+
+3. NO WARRANTY
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+   PARTICULAR PURPOSE AND NONINFRINGEMENT. TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO
+   EVENT SHALL APONO LTD. BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+   AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
+   THE SOFTWARE OR ITS USE.
+
+4. TERMINATION
+
+   The permissions in section 1 end automatically if you breach any term of this licence.
+
+5. CONTACT
+
+   For any use beyond the Intended Use, or to request other permissions, contact
+   Apono Ltd.

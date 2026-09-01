@@ -109,6 +109,15 @@ with missing ones (warns at the top and inflates nothing silently), all missing 
 could not be verified — never claims it was). Keep that distinction; claiming verification we did
 not do is worse than admitting the gap.
 
+## Licence constraint
+
+This is source-available, not open source: read and audit freely, run it for its intended use,
+everything else reserved to Apono (see [LICENSE](LICENSE)). Two practical consequences. Keep
+`package.json`'s `license` field as `SEE LICENSE IN LICENSE` — restoring an SPDX identifier like
+`MIT` would grant rights the licence withholds, and an npm publish would carry that claim. And
+before adding any dependency, check its licence is compatible with redistributing this way; the
+zero-dependency position avoids that question entirely, which is one more reason to keep it.
+
 ## Keep the source plain ASCII text
 
 `js/*.mjs` must stay ASCII with no control characters. Write non-ASCII as JS escapes

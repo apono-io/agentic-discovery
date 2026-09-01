@@ -94,6 +94,12 @@ are exact.
 | `--out <folder>` | Save the report somewhere specific. |
 | `--json` | Also save a machine-readable copy. |
 
+## Licence
+
+The source is published so you can read it before you run it — but it is **not open source**.
+You may read and audit it, and run it on machines you own or administer to produce your own report.
+All other rights are reserved to Apono Ltd., a 1Password company. See [LICENSE](LICENSE).
+
 ## Questions people ask
 
 **Does this read my conversations?** It reads local history files to count which tools were used

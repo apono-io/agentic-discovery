@@ -32,16 +32,41 @@ Reports/
 
 Names do not matter as long as they start with `agentic-access-report-`.
 
-## 3. Merge
+## 3. Install the skill (once)
+
+The consolidation is driven by a Claude Code skill that lives in this repository. Install it by
+copying it into your skills directory:
 
 ```bash
-node js/merge.mjs Reports --customer "Acme Corp"
+cp -R skills/agentic-access-assessment ~/.claude/skills/
 ```
 
-Writes `agentic-access-assessment-<date>.md`. Defaults to a `./Reports` folder if you omit the
-path; `--out DIR` chooses where the assessment lands.
+Then run `/reload-skills` in Claude Code. You only do this once; repeat it after pulling changes.
+(If you are also editing the skill, symlink instead of copying so the two cannot drift:
+`ln -s "$PWD/skills/agentic-access-assessment" ~/.claude/skills/`.)
 
-## 4. Read these four things before you send it
+## 4. Build the assessment
+
+Ask Claude Code, in your own words:
+
+> build the access assessment for Acme Corp from the reports in ./Reports
+
+The skill does the whole job: it merges the reports, runs the honesty checks in the next section
+before it builds anything, produces the interactive page, publishes it as a private link you can
+open and drill into, and then tells you what to lead with, what the uncomfortable finding is, and
+what it could not verify. That last part is the deliverable — the link on its own is not.
+
+If you would rather do it by hand, or you want only the Markdown:
+
+```bash
+node js/merge.mjs Reports --customer "Acme Corp" --json
+```
+
+Writes `agentic-access-assessment-<date>.md` plus a `.json` the page is built from. Defaults to a
+`./Reports` folder if you omit the path; `--out DIR` chooses where they land. Building the page from
+that JSON is `python3 skills/agentic-access-assessment/scripts/build_artifact.py <that>.json`.
+
+## 5. Read these before you send it
 
 **The headline.** One sentence: how many machines, how many resources, how many took writes, how
 many map to Apono integrations available today. If it does not read correctly, something is wrong
@@ -66,16 +91,15 @@ merger checks automatically, puts a warning at the very top of the assessment if
 says so plainly in the limitations when they agree. You never need to compare them by hand, but if
 you see that warning, stop and fix the inputs rather than shipping the document.
 
+**The identification rate.** The assessment states how many externally-reaching agent actions could
+be tied to a named resource. An action it could not name still reached something real, so the number
+tells you which direction every other count is wrong in — always understating, never overstating.
+A machine reporting zero resources needs its own rate checked before you call it clean: zero with no
+MCP servers used means genuinely no external access, while zero out of thirty-six external actions
+is a measurement gap that looks identical from the outside.
+
 **The limitations section at the bottom.** It states truncated rows, mixed redaction settings, and
 the catalog caveat. Read it, because a customer will.
-
-## Want the visual version?
-
-Ask Claude Code: *"build the access assessment for Acme from the reports in ./Reports"*. The
-`agentic-access-assessment` skill (in `skills/`) runs the merge, performs the honesty checks in this
-document, anonymises machine names, and publishes an interactive page where you can filter by access
-type and coverage tier and expand any resource type to see the individual resources behind it.
-Install it by copying `skills/agentic-access-assessment/` into `~/.claude/skills/`.
 
 ## Things that will bite you
 

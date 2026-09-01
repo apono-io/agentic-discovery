@@ -38,16 +38,26 @@ Names do not matter as long as they start with `agentic-access-report-`.
 
 ## 3. Install the skill (once)
 
-The consolidation is driven by a Claude Code skill that lives in this repository. Install it by
-copying it into your skills directory:
+The consolidation is driven by a Claude Code skill that lives in this repository. Installing it is
+one command:
 
 ```bash
-cp -R skills/agentic-access-assessment ~/.claude/skills/
+git clone https://github.com/apono-io/agentic-discovery.git ~/.claude/skills/agentic-discovery
 ```
 
-Then run `/reload-skills` in Claude Code. You only do this once; repeat it after pulling changes.
-(If you are also editing the skill, symlink instead of copying so the two cannot drift:
-`ln -s "$PWD/skills/agentic-access-assessment" ~/.claude/skills/`.)
+Claude Code loads any folder under `~/.claude/skills/` that carries a plugin manifest, so there is
+nothing else to run -- no copying, no install command. Skills are picked up live; if
+`~/.claude/skills/` did not exist before, restart Claude Code once so it starts watching the
+directory. Confirm with `/skills`, which should list `agentic-access-assessment`.
+
+To update later:
+
+```bash
+git -C ~/.claude/skills/agentic-discovery pull
+```
+
+The merger and the page builder ship in the same clone and the skill locates them itself, so the
+clone is the only copy you need.
 
 ## 4. Build the assessment
 
@@ -63,12 +73,14 @@ what it could not verify. That last part is the deliverable — the link on its 
 If you would rather do it by hand, or you want only the Markdown:
 
 ```bash
-node js/merge.mjs Reports --customer "Acme Corp" --json
+node ~/.claude/skills/agentic-discovery/js/merge.mjs Reports --customer "Acme Corp" --json
 ```
 
 Writes `agentic-access-assessment-<date>.md` plus a `.json` the page is built from. Defaults to a
 `./Reports` folder if you omit the path; `--out DIR` chooses where they land. Building the page from
-that JSON is `python3 skills/agentic-access-assessment/scripts/build_artifact.py <that>.json`.
+that JSON is
+`python3 ~/.claude/skills/agentic-discovery/skills/agentic-access-assessment/scripts/build_artifact.py <that>.json`,
+which writes `assessment.html` into the current directory.
 
 ## 5. Read these before you send it
 

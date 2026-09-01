@@ -148,6 +148,20 @@ npm. That is the same publication decision as making the repo public — do it d
 `package.json` carries `"private": true` to prevent an accidental `npm publish` before that
 decision is made. Remove it when publishing is intended, and pin the version at the same time.
 
+## How SEs get the skill
+
+The repo root doubles as a Claude Code plugin: `.claude-plugin/plugin.json` is what makes
+`git clone ... ~/.claude/skills/agentic-discovery` the entire install, with no marketplace and no
+install command. Claude Code sets `CLAUDE_PLUGIN_ROOT` for such a folder, which is how the skill
+finds `js/merge.mjs` and `scripts/build_artifact.py`; the commands in `SKILL.md` use
+`${CLAUDE_PLUGIN_ROOT:-.}` so they also work from a plain clone where the cwd is the repo root.
+Keep that fallback if you touch those lines.
+
+`.claude-plugin/marketplace.json` is optional. It only enables the alternative
+`/plugin marketplace add apono-io/agentic-discovery` + `/plugin install agentic-discovery@apono`
+route, which needs no clone but has no working directory for the scripts. `claude plugin validate .`
+checks both files.
+
 ## The one-liner, and why it is not npx
 
 npm 12 refuses both git specs (`EALLOWGIT`) and remote tarballs (`EALLOWREMOTE`), and the

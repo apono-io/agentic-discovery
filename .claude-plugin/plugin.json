@@ -1,0 +1,9 @@
+{
+  "name": "agentic-discovery",
+  "description": "Consolidate per-machine Agentic Access Reports into one assessment, with a drill-down page showing which resource types a customer's AI agents actually use.",
+  "version": "0.8.0",
+  "author": {
+    "name": "Apono, a 1Password company",
+    "url": "https://apono.io"
+  }
+}

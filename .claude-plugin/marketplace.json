@@ -1,0 +1,15 @@
+{
+  "name": "apono",
+  "description": "Apono's internal tooling for Claude Code. Currently: the Agentic Access Discovery assessment skill.",
+  "owner": {
+    "name": "Apono, a 1Password company",
+    "url": "https://apono.io"
+  },
+  "plugins": [
+    {
+      "name": "agentic-discovery",
+      "source": "./",
+      "description": "Consolidate per-machine Agentic Access Reports into one assessment, with a drill-down page showing which resource types a customer's AI agents actually use."
+    }
+  ]
+}

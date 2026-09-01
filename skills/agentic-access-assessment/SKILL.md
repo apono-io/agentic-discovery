@@ -16,13 +16,17 @@ to one integration decision. That is the shape of the answer.
 
 ## What you need
 
-The `agentic-discovery` repo (github.com/apono-io/agentic-discovery) and a folder of reports named
-`agentic-access-report-*.md`, one per participating machine. Node 18+.
+A folder of reports named `agentic-access-report-*.md`, one per participating machine. Node 18+, and
+Python 3 for the page.
+
+The merger and the page builder ship with this skill. `${CLAUDE_PLUGIN_ROOT}` is set when the skill
+is installed as a plugin; the `:-.` fallback in the commands below covers running from a clone of the
+repository, where the working directory is the repo root.
 
 ## Step 1 — merge, and get structured data out
 
 ```bash
-node js/merge.mjs <reports-folder> --customer "Acme Corp" --json --out <output-folder>
+node "${CLAUDE_PLUGIN_ROOT:-.}/js/merge.mjs" <reports-folder> --customer "Acme Corp" --json --out <output-folder>
 ```
 
 This writes two files: the assessment Markdown (for reading and for the customer) and a `.json`
@@ -93,7 +97,7 @@ them before quoting machine counts.
 design from scratch each time and every customer gets the same document:
 
 ```bash
-python3 scripts/build_artifact.py <assessment>.json    # writes assessment.html
+python3 "${CLAUDE_PLUGIN_ROOT:-.}/skills/agentic-access-assessment/scripts/build_artifact.py" <assessment>.json
 ```
 
 It handles the coverage badges, the drill-down, the filters and the limitations list. Read it before assuming it does something it does not, and edit it rather

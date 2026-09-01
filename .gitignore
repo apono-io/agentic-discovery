@@ -11,6 +11,7 @@ RESEARCH-NOTES.md
 dist/
 build/.work/
 agentic-access-assessment-*
+assessment.html
 Reports/
 
 # the single-file bundle IS committed on purpose -- it is what the one-liner fetches

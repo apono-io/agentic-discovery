@@ -180,7 +180,9 @@ function walkObj(d, out) {
 }
 /* Argument keys vary by vendor spelling: pageId / page_id / pageid all mean the same thing. */
 const normKey = (k) => String(k).toLowerCase().replace(/[_-]/g, "");
-const KEY_RULES = R.keyRules.map((r) => ({ ...r, normKeys: r.keys.map(normKey),
+const KEY_RULES = R.keyRules.map((r) => ({ ...r,
+                                           fromValue: (r.typeFromValue || []).map((v) => ({ ...v, rx: new RegExp(v.match) })),
+                                           normKeys: r.keys.map(normKey),
                                            toolRx: r.whenTool ? new RegExp(r.whenTool) : null,
                                            serverRx: r.whenServer ? new RegExp(r.whenServer) : null,
                                            extractRx: r.valueExtract ? new RegExp(r.valueExtract) : null }));
@@ -212,7 +214,9 @@ function extractArgs(args, agent, via, tool, cat, ts, server = "") {
         val = m[1];
       }
       if (rule.stripChars) val = val.split(new RegExp(`[${rule.stripChars}]`, "g")).join("");
-      const t = emit(rule.type, val, agent, via, tool, cat, ts);
+      // some identifiers name their own vendor -- "snowflake-snowflake-prod" is a Snowflake resource
+      const rtype = (rule.fromValue.find((v) => v.rx.test(val)) || {}).type || rule.type;
+      const t = emit(rtype, val, agent, via, tool, cat, ts);
       if (t) types.push(t);
       continue;
     }
@@ -392,13 +396,15 @@ function handleTool(agent, name, args, ts) {
     countAction(types, `${server} > ${tool}`);
     return;
   }
-  if (R.gatewayAliases.includes(sl) && R.gatewayControlTools.includes(tool)) return;
+  const isControl = (t) => R.gatewayControlTools.some((c) => t === c || t.endsWith(c));
+  if (R.gatewayAliases.includes(sl) && isControl(tool)) return;
   let cat = categorize(tool, args && typeof args === "object" ? args : {});
   let innerTool = tool;
   if (args && typeof args === "object" && "tool_name" in args) { // gateway-style wrapper
     const m = WRAPPER_RE.exec(String(args.tool_name || ""));
     if (m) {
       innerTool = m[1];
+      if (R.gatewayAliases.includes(sl) && isControl(innerTool)) return;   // control plane, wrapped
       let raw = args.arguments;
       if (typeof raw === "string") {
         try { raw = JSON.parse(raw); }

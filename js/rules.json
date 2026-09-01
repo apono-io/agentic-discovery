@@ -153,6 +153,83 @@
   "keyRules": [
     {
       "keys": [
+        "target"
+      ],
+      "whenServer": "^(apono-agentic-local|apono-agentic-remote|apono|apono_mcp|apono_prod|apono-agentic|apono-gateway|apono_gw|apono_staging|apono-prod)$",
+      "type": "apono-target",
+      "typeFromValue": [
+        {
+          "match": "knowledge",
+          "type": "knowledge-collection"
+        },
+        {
+          "match": "^snowflake[-_]",
+          "type": "snowflake"
+        },
+        {
+          "match": "^(postgresql|postgres)[-_]",
+          "type": "postgres"
+        },
+        {
+          "match": "^mysql[-_]",
+          "type": "mysql"
+        },
+        {
+          "match": "^mongodb[-_]",
+          "type": "mongodb"
+        },
+        {
+          "match": "^databricks[-_]",
+          "type": "databricks"
+        },
+        {
+          "match": "^aws[-_]",
+          "type": "aws"
+        },
+        {
+          "match": "^(gcp|google)[-_]",
+          "type": "gcp"
+        },
+        {
+          "match": "^az(ure)?[-_]",
+          "type": "azure"
+        },
+        {
+          "match": "^atlassian[-_]",
+          "type": "atlassian-site"
+        },
+        {
+          "match": "^github[-_]",
+          "type": "github-org"
+        },
+        {
+          "match": "^gitlab[-_]",
+          "type": "gitlab-repo"
+        },
+        {
+          "match": "^(mondaycom|monday)[-_]",
+          "type": "monday-board"
+        },
+        {
+          "match": "^mixpanel[-_]",
+          "type": "mixpanel"
+        },
+        {
+          "match": "^okta[-_]",
+          "type": "okta"
+        },
+        {
+          "match": "^(jfrog|artifactory)[-_]",
+          "type": "jfrog-repo"
+        },
+        {
+          "match": "k8s|kubernetes|eks|gke|aks",
+          "type": "k8s"
+        }
+      ]
+    },
+    {
+      "keys": [
         "page_id",
         "id"
       ],
@@ -663,7 +740,14 @@
     "list_available_resources",
     "list_resources_filtered",
     "_proxy__setup_target",
-    "_proxy__list_targets"
+    "_proxy__list_targets",
+    "list_access_requests",
+    "list_access_flows",
+    "get_access_flow",
+    "list_accounts",
+    "find_accounts",
+    "list_integrations",
+    "get_integration"
   ],
   "gatewayWrapperRegex": "^apn_[0-9a-f]+__(.+)$",
   "resourceGroups": {
@@ -709,6 +793,9 @@
     ],
     "Artifact registries": [
       "jfrog-repo"
+    ],
+    "Brokered via Apono": [
+      "apono-target"
     ]
   },
   "reportGroups": [
@@ -718,6 +805,7 @@
     "Code hosting",
     "Artifact registries",
     "Web",
+    "Brokered via Apono",
     "Other"
   ],
   "rowLimits": {
@@ -1238,7 +1326,7 @@
       "rid": "Notion workspace"
     },
     {
-      "toolPattern": "\\w*(Confluence|Jira)\\w*",
+      "toolPattern": "\\w*(Confluence|Jira|Atlassian)\\w*",
       "type": "atlassian-site",
       "rid": "Atlassian (site not named)"
     },
@@ -1355,7 +1443,8 @@
       "monday-board",
       "mixpanel",
       "okta",
-      "knowledge-collection"
+      "knowledge-collection",
+      "apono-target"
     ],
     "oauthMcp": [
       "notion",

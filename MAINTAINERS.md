@@ -159,10 +159,33 @@ curl -fsSL https://raw.githubusercontent.com/apono-io/agentic-discovery/main/age
 ```
 
 It fetches `agentic-discovery.cjs`, the committed single-file bundle produced by
-`node build/bundle.mjs` with `js/rules.json` inlined. **Regenerate and commit the bundle in the same
-commit as any change to `js/discover.mjs` or `js/rules.json`** -- a stale bundle means the one-liner
-silently runs old rules. A CI check comparing the committed bundle against a fresh build is the
-obvious guard and does not exist yet.
+`node build/bundle.mjs` with `js/rules.json` inlined.
+
+### The bundle rebuilds itself -- you do not have to remember
+
+A stale bundle would mean every user silently runs old rules, so two layers keep it in step and you
+should not need to think about either.
+
+**CI** (`.github/workflows/bundle.yml`) fires on any push touching `js/discover.mjs`,
+`js/rules.json` or `build/bundle.mjs`. It rebuilds, checks the result actually parses and writes a
+report on the runner, and commits the bundle back to the branch as `github-actions[bot]` if it
+drifted. On a pull request it fails with an instruction instead of pushing, because a fork PR cannot
+be pushed to. The commit is marked `[skip ci]`, and the workflow's own path filter excludes the
+bundle, so it cannot loop.
+
+**A pre-commit hook** does the same locally, which is where drift is cheapest to fix. Once per
+clone:
+
+```bash
+git config core.hooksPath hooks
+```
+
+After that, staging a change to `js/` rebuilds and stages the bundle with it.
+
+Two things to know. If `main` ever gets branch protection requiring pull requests, the bot's
+push-back will start failing and the hook becomes the real mechanism. And the bundle is a build
+artifact under version control, so expect the occasional bot commit in the log -- that is the system
+working, not noise to clean up.
 
 Publishing to the npm registry as `@apono-io/agentic-discovery` would allow a plain
 `npx @apono-io/agentic-discovery`. The name is free and the scope is writable, but it needs

@@ -2221,6 +2221,24 @@ function buildReport() {
     if (memRows.length > limit) add(`| ...and ${memRows.length - limit} more | | | | |`);
     add("");
   }
+  if (UNRESOLVED.size) {
+    const rows = [...UNRESOLVED.entries()].sort((a, b) => b[1] - a[1] || cmp(a[0], b[0]));
+    const tot = rows.reduce((n, [, c]) => n + c, 0);
+    add("## Actions that reached outside but named no resource"); add("");
+    add(`*${tot} actions reached something external without naming a resource this scan could ` +
+        `identify. They are real access, so every count above understates rather than overstates. ` +
+        `Some of these tools carry no resource identifier at all (browser click-and-type ` +
+        `automation, where the page is tab state rather than an argument); others name their ` +
+        `target in a way this version does not yet read. Listing them is how the next version ` +
+        `learns -- the top rows are worth reporting back to Apono.*`); add("");
+    add("| Tool | Actions | Share of unidentified |");
+    add("|---|---|---|");
+    const limit = R.rowLimits.default || rows.length;
+    for (const [lbl, c] of rows.slice(0, limit))
+      add(`| ${mdSafe(lbl)} | ${c} | ${((c / tot) * 100).toFixed(1)}% |`);
+    if (rows.length > limit) add(`| ...and ${rows.length - limit} more | | |`);
+    add("");
+  }
   add("## Coverage notes & known gaps"); add("");
   for (const [name, a] of AGENTS) for (const g of a.gaps) add(`- **${name}:** ${g}`);
   for (const g of R.genericGaps) add(`- ${g}`);

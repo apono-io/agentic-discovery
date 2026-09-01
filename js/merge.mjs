@@ -75,7 +75,7 @@ function parseMd(md, file) {
       const m = /identification rate: (\d+)\/(\d+)/.exec(md);
       return m ? { resolved: +m[1], external: +m[2] } : null;
     })(),
-    agents: [], mcp: [], resources: [], memory: [],
+    agents: [], mcp: [], resources: [], memory: [], unresolved: [],
   };
   const T = (h2, h3 = "") => (tables[h2] && tables[h2][h3]) || { rows: [] };
   for (const r of T("Agent apps on this machine").rows)
@@ -95,6 +95,8 @@ function parseMd(md, file) {
   for (const r of T("Resources named in agent memory & instructions").rows)
     rep.memory.push({ rid: clean(r[0]), rtype: clean(r[1]),
                       mentions: parseInt(clean(r[2])) || 0 });
+  for (const r of T("Actions that reached outside but named no resource").rows)
+    rep.unresolved.push({ tool: clean(r[0]), calls: parseInt(clean(r[1])) || 0 });
   return rep;
 }
 
@@ -104,7 +106,7 @@ function parseJson(j, file) {
                 generated: ["?", j.platform || "?"], version: j.version || "?",
                 saltBasis: j.redacted ? "redacted" : "not redacted", fingerprint: j.saltFingerprint || "",
                 idRate: null,
-                agents: [], mcp: [], resources: [], memory: [] };
+                agents: [], mcp: [], resources: [], memory: [], unresolved: [] };
   for (const [agent, a] of Object.entries(j.agents || {}))
     rep.agents.push({ agent, present: !!a.installed,
                       activity: a.actions ? `${a.actions} actions` : "none found",
@@ -126,7 +128,7 @@ function parseJson(j, file) {
 
 // ---------------------------------------------------------------- merge
 function mergeReports(reports) {
-  const res = new Map(), mcp = new Map(), mem = new Map();
+  const res = new Map(), mcp = new Map(), mem = new Map(), unres = new Map();
   const bump = (map, key, init, fn) => {
     const v = map.get(key) || init(); map.set(key, v); fn(v); return v;
   };
@@ -141,6 +143,10 @@ function mergeReports(reports) {
           v.machines.add(rep.machine);
           if (r.last > v.last) v.last = r.last;
         });
+    for (const u of rep.unresolved)
+      bump(unres, u.tool,
+        () => ({ tool: u.tool, calls: 0, machines: new Set() }),
+        (v) => { v.calls += u.calls; v.machines.add(rep.machine); });
     for (const m of rep.mcp)
       bump(mcp, m.server,
         () => ({ server: m.server, calls: 0, usedOn: new Set(), configuredOn: new Set(),
@@ -156,7 +162,7 @@ function mergeReports(reports) {
         () => ({ rtype: x.rtype, rid: x.rid, mentions: 0, machines: new Set() }),
         (v) => { v.mentions += x.mentions; v.machines.add(rep.machine); });
   }
-  return { res, mcp, mem };
+  return { res, mcp, mem, unres };
 }
 
 // ---------------------------------------------------------------- render
@@ -299,6 +305,26 @@ function render(reports, merged, opts) {
     add("");
   }
 
+  if (merged.unres.size) {
+    const rows = [...merged.unres.values()].sort((a, b) => b.calls - a.calls || (a.tool < b.tool ? -1 : a.tool > b.tool ? 1 : 0));
+    const tot = rows.reduce((n, r) => n + r.calls, 0);
+    add("## Access we could not attribute, fleet-wide"); add("");
+    const contributing = new Set();
+    for (const r of rows) for (const m of r.machines) contributing.add(m);
+    add(`${tot} actions reached something external without naming a resource this version can ` +
+        `identify. These are real accesses, so every count in this document understates the ` +
+        `estate rather than overstating it. The rows are ordered by volume: the top ones are ` +
+        `where a new extraction rule buys the most coverage, and they are worth sending back to ` +
+        `Apono.`); add("");
+    if (contributing.size < reports.length)
+      add(`**Counted from ${contributing.size} of ${reports.length} machines.** Only reports from ` +
+          `v0.9 onwards list unattributed actions, so the machines on older versions contribute ` +
+          `nothing here and the real total is higher.`), add("");
+    add("| Tool | Actions | Machines |");
+    add("|---|---|---|");
+    for (const r of rows) add(`| ${r.tool} | ${r.calls} | ${r.machines.size} |`);
+    add("");
+  }
   add("## How to read this, and what it does not cover");
   add("");
   if (known.length > 1 || (known.length && unverifiable))
@@ -332,6 +358,18 @@ function render(reports, merged, opts) {
         `could not name -- usually an MCP server whose arguments we have no extraction rule for. ` +
         `Everything above therefore understates the estate rather than overstating it. The largest ` +
         `single gap is ${worst.machine} at ${worst.idRate.resolved}/${worst.idRate.external}.`);
+  }
+  const versions = [...new Set(reports.map((r) => r.version))].sort();
+  if (versions.length > 1) {
+    const pre09 = reports.filter((r) => r.version !== "?" && parseFloat(r.version) < 0.9);
+    add(`- **These reports come from mixed tool versions (${versions.map((v) => "v" + v).join(", ")}), ` +
+        `which is not only a row-count difference.** Versions before v0.9 excluded code hosting ` +
+        `(GitHub/GitLab/git) and web access from the report entirely, and had no rules for GitLab ` +
+        `or JFrog Artifactory. So a machine on an older version contributes zero rows for those ` +
+        `types no matter what it actually did` +
+        (pre09.length ? ` -- ${pre09.length} of ${reports.length} machines here` : "") +
+        `. Any per-type machine count spanning those types reflects who re-ran the scan, not who ` +
+        `used the resource. Re-run every machine on one version before quoting those numbers.`);
   }
   const totalDropped = reports.flatMap((r) => r.dropped).reduce((n, d) => n + d.count, 0);
   if (totalDropped)
@@ -416,6 +454,9 @@ function main() {
         return { resolved: rated.reduce((n, r) => n + r.idRate.resolved, 0),
                  external: rated.reduce((n, r) => n + r.idRate.external, 0) };
       })(),
+      unresolved: [...merged.unres.values()]
+        .sort((a, b) => b.calls - a.calls)
+        .map((u) => ({ tool: u.tool, calls: u.calls, machines: u.machines.size })),
       machines: reports.map((r) => ({ machine: r.machine, generated: r.generated[0],
                                       idRate: r.idRate,
                                       version: r.version, saltBasis: r.saltBasis,

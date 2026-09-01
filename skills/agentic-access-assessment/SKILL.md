@@ -56,6 +56,12 @@ customer something is supported when it is not is worse than telling them nothin
 **Redaction.** Reports should say "Resource names are redacted". If one was run with
 `--no-redact`, it contains real resource names — do not put that in an artifact without asking.
 
+**Mixed tool versions.** The assessment warns when reports span versions. This is not only a
+row-count difference: before v0.9 code hosting and web access were excluded from reports entirely and
+there were no GitLab or JFrog rules, so an older report contributes zero rows for those types
+regardless of what that machine did. Per-type machine counts then reflect who re-ran the scan. Get
+every machine onto one version before quoting them.
+
 **The identification rate, per machine and fleet-wide.** Each report states how many of its
 externally-reaching actions could be tied to a named resource. The assessment aggregates it, and it
 belongs in the conversation because it is the one number that tells the reader which direction the
@@ -163,7 +169,14 @@ The page is structured around the type view, in this order:
    server on six machines is an organisation-wide pattern, the same call count on one machine is one
    person's experiment, and those need different responses.
 
-7. **Limitations, visible rather than buried** — truncated rows, fingerprint status, the catalog
+7. **Unattributed access.** The assessment's "Access we could not attribute" table names the tools
+   whose calls reached outside without naming a resource, by volume. Put it on the page: it is the
+   direct answer to "is this everything?", which is always asked, and the top rows are the rules
+   worth adding next. Report them back rather than only reading them -- that is how the next
+   version covers more. Check whether it says it counted fewer machines than the assessment has;
+   older reports contribute nothing to it.
+
+8. **Limitations, visible rather than buried** — truncated rows, fingerprint status, the catalog
    date. A customer will read this section, and its presence is what makes the rest credible.
 
 Build the tables from the JSON by embedding the data in the page and rendering with a small script,

@@ -148,6 +148,17 @@ npm. That is the same publication decision as making the repo public — do it d
 `package.json` carries `"private": true` to prevent an accidental `npm publish` before that
 decision is made. Remove it when publishing is intended, and pin the version at the same time.
 
+## The npx channel is currently broken by npm itself
+
+`npx github:apono-io/agentic-discovery` worked until npm 12, which ships `allow-git: none` and
+refuses git-spec installs — and `--allow-git=always` does not override it. The docs therefore lead
+with `git clone`, which also suits the read-it-before-you-run-it argument.
+
+Restoring a one-command path means publishing to the npm registry as `@apono-io/agentic-discovery`,
+which needs `"private": true` removed from `package.json` and a deliberate decision, since the
+licence is source-available rather than open source. Until then, do not re-add npx instructions to
+the docs.
+
 ## Building and publishing
 
 ```bash

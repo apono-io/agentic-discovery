@@ -6,8 +6,13 @@ Agentic Access Assessment you can put in front of a customer.
 ## 1. Ask participants to run the scan
 
 ```bash
-npx github:apono-io/agentic-discovery
+git clone https://github.com/apono-io/agentic-discovery.git
+cd agentic-discovery
+node js/discover.mjs
 ```
+
+(`npx github:apono-io/agentic-discovery` no longer works on npm 12, which disables git-spec installs
+by default. Cloning is the path to hand people.)
 
 They get one file — `agentic-access-report-<machine>-<date>.md` — which they read and send you.
 That single Markdown file is the complete input: every row is in it, nothing is truncated. (A

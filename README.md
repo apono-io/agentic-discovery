@@ -11,17 +11,22 @@ You need **Node.js 18 or newer** (check with `node --version`; if you don't have
 "LTS" build from [nodejs.org](https://nodejs.org), or `brew install node` on macOS /
 `winget install OpenJS.NodeJS` on Windows).
 
-Then one command — nothing to clone, nothing left installed:
+Clone it and run one command:
 
 ```bash
-npx github:apono-io/agentic-discovery
+git clone https://github.com/apono-io/agentic-discovery.git
+cd agentic-discovery
+node js/discover.mjs
 ```
+
+(No git? Use the green **Code → Download ZIP** button above, unzip it, and open a terminal in that
+folder.)
 
 It takes a few minutes, tells you the label your machine is reported under, and prints where it
 saved the report:
 
-    This machine is reported as: n___s~b0f-macbook-pro
-    agentic-access-report-n___s~b0f-macbook-pro-<date>.md
+    This machine is reported as: a___h~b0f-macbook-pro
+    agentic-access-report-a___h~b0f-macbook-pro-<date>.md
 
 Computer names usually contain a person's name, so the report masks that part while keeping enough
 to recognise the machine — `asmith-MacBook-Pro` becomes `a___h~b0f-macbook-pro`. Your full name is
@@ -29,11 +34,16 @@ not in the filename, the report, or anything built from it. (The short code afte
 two similarly-named computers from being mistaken for each other.) If you would rather share the
 real name, run with `--no-redact`.
 
-Open that file in any text editor, or preview it on macOS with:
+Open the report in any text editor, or preview it on macOS with:
 
 ```bash
 open agentic-access-report-*.md
 ```
+
+> **Why not `npx`?** npm 12 disables installing straight from a git repository by default
+> (`allow-git: none`), so `npx github:apono-io/agentic-discovery` fails on current npm even though
+> the repository is public. Cloning avoids the issue entirely and lets you read the code first,
+> which is the point.
 
 ### Prefer to read the code first?
 

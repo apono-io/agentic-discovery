@@ -11,16 +11,20 @@ You need **Node.js 18 or newer** (check with `node --version`; if you don't have
 "LTS" build from [nodejs.org](https://nodejs.org), or `brew install node` on macOS /
 `winget install OpenJS.NodeJS` on Windows).
 
-Clone it and run one command:
+One command, nothing to install and nothing left behind:
 
 ```bash
-git clone https://github.com/apono-io/agentic-discovery.git
-cd agentic-discovery
-node js/discover.mjs
+NPM_CONFIG_ALLOW_GIT=always npx -y github:apono-io/agentic-discovery
 ```
 
-(No git? Use the green **Code → Download ZIP** button above, unzip it, and open a terminal in that
-folder.)
+On Windows PowerShell:
+
+```powershell
+$env:NPM_CONFIG_ALLOW_GIT="always"; npx -y github:apono-io/agentic-discovery
+```
+
+(The `NPM_CONFIG_ALLOW_GIT` part is there because npm 12 refuses to install straight from a git
+repository unless you say it is fine. Nothing else about the command is unusual.)
 
 It takes a few minutes, tells you the label your machine is reported under, and prints where it
 saved the report:
@@ -39,11 +43,6 @@ Open the report in any text editor, or preview it on macOS with:
 ```bash
 open agentic-access-report-*.md
 ```
-
-> **Why not `npx`?** npm 12 disables installing straight from a git repository by default
-> (`allow-git: none`), so `npx github:apono-io/agentic-discovery` fails on current npm even though
-> the repository is public. Cloning avoids the issue entirely and lets you read the code first,
-> which is the point.
 
 ### Prefer to read the code first?
 

@@ -619,9 +619,17 @@ elif prints == {None}:
     limits.append("**Comparability is unverified.** These reports predate salt fingerprinting, so "
                   "nothing in them proves every machine used the same redaction salt. They matched "
                   "correctly if all used the default organization domain and none passed a custom salt.")
-elif len(prints) > 1:
+elif len([p for p in prints if p]) > 1:
     limits.append("**Salt fingerprints differ between machines.** The same resource redacts "
                   "differently across them, so totals above over-count. Re-run with a consistent salt.")
+elif None in prints or "" in prints:
+    known = sorted(p for p in prints if p)
+    n_missing = sum(1 for m in machines if not m.get("fingerprint"))
+    limits.append(f"**{len(machines) - n_missing} of {len(machines)} machines share one salt "
+                  f"fingerprint ({known[0]}); {n_missing} predate fingerprinting and carry none.** "
+                  "Nothing contradicts comparability, but nothing proves it for those reports "
+                  "either \u2014 they matched correctly if they used the default organization domain. "
+                  "Re-run them to verify rather than assume.")
 else:
     limits.append("**All machines share one salt fingerprint**, so resources matched correctly across them.")
 limits.append("**Resource names are redacted.** Types, access levels, tools, machine counts and "
@@ -639,6 +647,17 @@ if ident and ident.get("external"):
                      "could not name, almost always an MCP server whose arguments we have no "
                      "extraction rule for yet. Every count on this page therefore understates the "
                      "estate rather than overstating it.")
+vers = sorted({m["version"] for m in machines if m.get("version") and m["version"] != "?"})
+if len(vers) > 1:
+    old_v = [m for m in machines if m.get("version", "?") != "?" and float(m["version"]) < 0.9]
+    limits.insert(1, f"**These reports come from mixed tool versions (" +
+                  ", ".join("v" + v for v in vers) + "), which changes which resource types a "
+                  "report can contain at all.** Before v0.9, code hosting and web access were "
+                  "excluded from reports entirely and there were no GitLab or JFrog rules, so "
+                  f"{len(old_v)} of {len(machines)} machines here contribute zero rows for those "
+                  "types no matter what they actually did. Any machine count on a code-hosting, "
+                  "web, GitLab or JFrog row reflects who re-ran the scan, not who used the "
+                  "resource. Get every machine onto one version before quoting those numbers.")
 limits.append(f"**Coverage labels go stale.** {data['catalogNote']}")
 
 payload = {

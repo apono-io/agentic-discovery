@@ -1,0 +1,84 @@
+# The one-liner in the README fetches agentic-discovery.cjs straight from this branch, so a
+# stale bundle means users silently run old rules. This keeps it in step with js/.
+#
+#   push  -> rebuild and commit the bundle if it drifted
+#   PR    -> fail if it drifted (a fork PR cannot be pushed to)
+#
+# The two path lists must stay identical; GitHub Actions does not support YAML anchors.
+name: bundle
+
+on:
+  push:
+    paths:
+      - js/discover.mjs
+      - js/rules.json
+      - build/bundle.mjs
+      - .github/workflows/bundle.yml
+  pull_request:
+    paths:
+      - js/discover.mjs
+      - js/rules.json
+      - build/bundle.mjs
+      - .github/workflows/bundle.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Serialise per branch: two pushes in flight would race on the push-back.
+concurrency:
+  group: bundle-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Check out the branch itself, not the detached merge commit, so we can push back.
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Rebuild the bundle
+        run: node build/bundle.mjs
+
+      - name: Does it still parse and run?
+        run: |
+          node --check agentic-discovery.cjs
+          # A real run on an agent-less runner: exercises the scan and the report writer.
+          # Finding nothing is the expected result; crashing is the failure we are looking for.
+          mkdir -p "$RUNNER_TEMP/smoke"
+          node agentic-discovery.cjs --out "$RUNNER_TEMP/smoke"
+          test -n "$(find "$RUNNER_TEMP/smoke" -name 'agentic-access-report-*.md' -print -quit)" \
+            || { echo "::error::the bundle ran but wrote no report"; exit 1; }
+
+      - name: Did it drift?
+        id: check
+        run: |
+          if git diff --quiet -- agentic-discovery.cjs; then
+            echo "drifted=false" >> "$GITHUB_OUTPUT"
+            echo "Bundle was already in step with js/." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "drifted=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit the rebuilt bundle
+        if: steps.check.outputs.drifted == 'true' && github.event_name != 'pull_request'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add agentic-discovery.cjs
+          git commit -m "Rebuild agentic-discovery.cjs from js/ [skip ci]"
+          # The branch may have moved while we built; rebase onto it rather than failing.
+          git push || { git pull --rebase --autostash && git push; }
+          echo "Rebuilt and committed the bundle." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Stale bundle on a pull request
+        if: steps.check.outputs.drifted == 'true' && github.event_name == 'pull_request'
+        run: |
+          echo "::error::agentic-discovery.cjs does not match js/. Run 'node build/bundle.mjs' and commit the result."
+          exit 1

@@ -2,6 +2,9 @@
   "name": "@apono-io/agentic-discovery",
   "version": "0.8.0",
   "description": "Read-only, no-network scan of local AI-agent usage; produces a human-readable, redacted-by-default access report.",
+  "scripts": {
+    "bundle": "node build/bundle.mjs"
+  },
   "type": "module",
   "bin": {
     "agentic-discovery": "js/discover.mjs",

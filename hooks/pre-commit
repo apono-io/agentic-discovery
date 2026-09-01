@@ -1,0 +1,8 @@
+#!/bin/sh
+# Rebuild the bundle whenever its sources are staged, so the committed bundle is never stale.
+# Install once, per clone:  git config core.hooksPath hooks
+set -e
+git diff --cached --name-only | grep -qE '^(js/discover\.mjs|js/rules\.json|build/bundle\.mjs)$' || exit 0
+echo "pre-commit: rebuilding agentic-discovery.cjs"
+node build/bundle.mjs
+git add agentic-discovery.cjs

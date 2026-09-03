@@ -2207,6 +2207,15 @@ const R = {
             ".vscode-server"
           ],
           "evidence": "VS Code remote/WSL server"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Code",
+            "User",
+            "chatSessions"
+          ],
+          "evidence": "VS Code chat sessions"
         }
       ],
       "mcpConfigs": [
@@ -2261,7 +2270,10 @@ const R = {
             "User",
             "workspaceStorage"
           ],
-          "suffix": ".json",
+          "suffix": [
+            ".jsonl",
+            ".json"
+          ],
           "mustContain": "chatSessions",
           "parser": "vscodeChatSessions"
         },
@@ -2272,7 +2284,10 @@ const R = {
             "User",
             "globalStorage"
           ],
-          "suffix": ".json",
+          "suffix": [
+            ".jsonl",
+            ".json"
+          ],
           "mustContain": "chatSessions",
           "parser": "vscodeChatSessions"
         },
@@ -2283,7 +2298,10 @@ const R = {
             "User",
             "workspaceStorage"
           ],
-          "suffix": ".json",
+          "suffix": [
+            ".jsonl",
+            ".json"
+          ],
           "mustContain": "chatSessions",
           "parser": "vscodeChatSessions"
         }
@@ -3008,7 +3026,7 @@ function* walkFiles(dir, suffix, depth = 0) {
     let st; try { st = fs.lstatSync(p); } catch { continue; }
     if (st.isSymbolicLink()) continue;         // never follow symlinks while walking
     if (st.isDirectory()) yield* walkFiles(p, suffix, depth + 1);
-    else if (e.endsWith(suffix)) yield p;
+    else if ([].concat(suffix).some((sx) => e.endsWith(sx))) yield p;
   }
 }
 
@@ -3432,26 +3450,53 @@ const vscodeToolName = (raw) => {
   const m = /^mcp_(.+?)_(.+)$/.exec(raw);
   return m ? `mcp__${m[1]}__${m[2]}` : raw;
 };
-/* Walk a chat request for tool invocations. Shapes differ between VS Code versions, so this
-   looks for a tool identifier anywhere rather than trusting one path, and yields nothing it
-   cannot identify -- an unread invocation is counted as unattributed, never invented. */
+/* Terminal tools differ by name across builds; the command itself is what matters. */
+const VSCODE_TERMINALISH = /terminal|runcommand|run_in_terminal|runinterminal|shell|^exec$/i;
+const VSCODE_CMD_KEYS = ["command", "cmd", "commandLine", "terminalCommand"];
+/* Emit one invocation, routing a terminal command through the shell analysis so a
+   VS Code agent running "kubectl get pods" is treated like any other CLI access. */
+function emitVscodeTool(name, args, emit) {
+  const cmd = VSCODE_CMD_KEYS.map((k) => {
+    const v = args[k];
+    if (typeof v === "string") return v;
+    if (v && typeof v === "object") return v.original || v.toolEdited || v.command;
+    return null;
+  }).find((c) => typeof c === "string" && c);
+  if (cmd && VSCODE_TERMINALISH.test(name)) emit("bash", { command: cmd });
+  else emit(vscodeToolName(name), args);
+}
+const asObject = (a) => {
+  if (typeof a === "string") { try { a = JSON.parse(a); } catch { return {}; } }
+  return a && typeof a === "object" ? a : {};
+};
+/* Walk a chat request for tool invocations. The shape moves between VS Code versions, so
+   two known carriers are handled: a toolCalls array (current -- reached via
+   result.metadata.toolCallRounds) and a toolId/toolName object (serialized response parts in
+   other builds). Nothing else is treated as a call: model text that merely contains
+   tool-call syntax is not evidence a tool ran, and inventing access is the one error worth
+   avoiding above all others. */
 function walkVscodeTools(node, emit, depth = 0) {
-  if (!node || typeof node !== "object" || depth > 8) return;
+  if (!node || typeof node !== "object" || depth > 14) return;
   if (Array.isArray(node)) { for (const v of node) walkVscodeTools(v, emit, depth + 1); return; }
+  if (Array.isArray(node.toolCalls)) {
+    for (const tc of node.toolCalls) {
+      if (!tc || typeof tc !== "object") continue;
+      const fn = tc.function && typeof tc.function === "object" ? tc.function : {};
+      const nm = [tc.name, tc.toolName, tc.toolId, fn.name]
+        .find((x) => typeof x === "string" && x);
+      if (!nm) continue;
+      const raw = [tc.arguments, tc.input, tc.rawInput, tc.parameters, fn.arguments]
+        .find((a) => a !== undefined);
+      emitVscodeTool(nm, asObject(raw), emit);
+    }
+  }
   const id = typeof node.toolId === "string" ? node.toolId
            : typeof node.toolName === "string" ? node.toolName : null;
   if (id) {
-    const sd = (node.toolSpecificData && typeof node.toolSpecificData === "object")
-      ? node.toolSpecificData : {};
-    const cmd = sd.command
-      || (sd.commandLine && (sd.commandLine.original || sd.commandLine.toolEdited))
-      || (sd.terminalCommand && sd.terminalCommand.command);
-    if (typeof cmd === "string" && cmd) emit("bash", { command: cmd });
-    else {
-      const args = [sd.rawInput, sd.input, node.rawInput, node.input, node.arguments, node.parameters]
-        .find((a) => a && typeof a === "object") || {};
-      emit(vscodeToolName(id), args);
-    }
+    const sd = asObject(node.toolSpecificData);
+    const args = [sd.rawInput, sd.input, node.rawInput, node.input, node.arguments, node.parameters]
+      .find((a) => a && typeof a === "object");
+    emitVscodeTool(id, args || sd, emit);
   }
   for (const v of Object.values(node)) walkVscodeTools(v, emit, depth + 1);
 }
@@ -3482,16 +3527,26 @@ const PARSERS = {
       }
     }
   },
-  /* VS Code chat / agent mode: one JSON file per session under workspaceStorage. */
+  /* VS Code chat / agent sessions. The files are .jsonl: each line is a {kind, v} envelope
+     -- kind 0 carries a session snapshot whose v.requests holds the turns, later kinds carry
+     arrays of turns. Tool calls sit under each turn at result.metadata.toolCallRounds. */
   vscodeChatSessions(file, agent) {
     agentRec(agent).sessions++;
     const txt = readText(file); if (txt === null) return;
-    let d; try { d = JSON.parse(txt); } catch { return; }
-    const reqs = Array.isArray(d && d.requests) ? d.requests : [d];
-    const fallbackTs = vscodeTs(d && (d.creationDate || d.lastMessageDate));
-    for (const req of reqs) {
-      const ts = vscodeTs(req && (req.timestamp || req.startTime)) || fallbackTs;
-      walkVscodeTools(req, (name, args) => handleTool(agent, name, args, ts));
+    let sessionTs = null;
+    for (const line of txt.split(/\r?\n/)) {
+      if (!line.trim()) continue;
+      let rec; try { rec = JSON.parse(line); } catch { continue; }
+      const v = rec && rec.v !== undefined ? rec.v : rec;
+      if (!v || typeof v !== "object") continue;
+      sessionTs = sessionTs || vscodeTs(v.creationDate);
+      const turns = Array.isArray(v) ? v
+                  : Array.isArray(v.requests) ? v.requests
+                  : [v];
+      for (const t of turns) {
+        const ts = vscodeTs(t && (t.timestamp || t.responseTimestamp)) || sessionTs;
+        walkVscodeTools(t, (name, args) => handleTool(agent, name, args, ts));
+      }
     }
   },
   /* VS Code-family editors (Cursor et al.): conversations in a SQLite key/value store.
@@ -3589,7 +3644,8 @@ async function scanTranscripts(host, prof) {
     const p = srcPath(prof, src);
     if (src.suffix) {
       for (const f of walkFiles(p, src.suffix)) {
-        if (src.mustContain && !f.includes(src.mustContain)) continue;
+        // case-insensitive: VS Code has both chatSessions and emptyWindowChatSessions
+        if (src.mustContain && !f.toLowerCase().includes(src.mustContain.toLowerCase())) continue;
         await parser(f, host.name, src, host);
       }
     } else if (isFile(p)) {

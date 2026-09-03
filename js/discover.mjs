@@ -32,6 +32,18 @@ const readText = (p) => {
   } catch { return null; }
 };
 const readJson = (p) => { try { return JSON.parse(fs.readFileSync(p, "utf-8")); } catch { return null; } };
+/* VS Code's settings.json is JSONC: comments and trailing commas are legal there. */
+function readJsonc(p) {
+  const direct = readJson(p); if (direct) return direct;
+  const txt = readText(p); if (txt === null) return null;
+  const stripped = txt
+    .replace(/"(?:[^"\\]|\\.)*"|\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, (m) => (m[0] === '"' ? m : " "))
+    .replace(/,(\s*[}\]])/g, "$1");
+  try { return JSON.parse(stripped); } catch { return null; }
+}
+/* "mcp.servers" -> cfg.mcp.servers; a plain key still works. */
+const jsonAt = (obj, key) =>
+  key.split(".").reduce((o, k) => (o && typeof o === "object" ? o[k] : undefined), obj);
 const listDir = (p) => { try { return fs.readdirSync(p); } catch { return []; } };
 function* walkFiles(dir, suffix, depth = 0) {
   if (depth > 16) return;                      // defense against pathological nesting
@@ -451,6 +463,43 @@ function expandPath(base, parts) {
   return cur;
 }
 
+/* VS Code writes epoch milliseconds; other shapes are left alone. */
+const vscodeTs = (v) => {
+  if (typeof v === "number" && v > 1e12) return new Date(v).toISOString();
+  if (typeof v === "string" && /^\d{4}-\d\d-\d\d/.test(v)) return v;
+  return null;
+};
+/* VS Code names an MCP tool "mcp_<server>_<tool>"; the rest of this file expects
+   "mcp__<server>__<tool>". Server names may contain underscores, so this splits on the
+   first separator and accepts that an unusual name may attribute imperfectly. */
+const vscodeToolName = (raw) => {
+  const m = /^mcp_(.+?)_(.+)$/.exec(raw);
+  return m ? `mcp__${m[1]}__${m[2]}` : raw;
+};
+/* Walk a chat request for tool invocations. Shapes differ between VS Code versions, so this
+   looks for a tool identifier anywhere rather than trusting one path, and yields nothing it
+   cannot identify -- an unread invocation is counted as unattributed, never invented. */
+function walkVscodeTools(node, emit, depth = 0) {
+  if (!node || typeof node !== "object" || depth > 8) return;
+  if (Array.isArray(node)) { for (const v of node) walkVscodeTools(v, emit, depth + 1); return; }
+  const id = typeof node.toolId === "string" ? node.toolId
+           : typeof node.toolName === "string" ? node.toolName : null;
+  if (id) {
+    const sd = (node.toolSpecificData && typeof node.toolSpecificData === "object")
+      ? node.toolSpecificData : {};
+    const cmd = sd.command
+      || (sd.commandLine && (sd.commandLine.original || sd.commandLine.toolEdited))
+      || (sd.terminalCommand && sd.terminalCommand.command);
+    if (typeof cmd === "string" && cmd) emit("bash", { command: cmd });
+    else {
+      const args = [sd.rawInput, sd.input, node.rawInput, node.input, node.arguments, node.parameters]
+        .find((a) => a && typeof a === "object") || {};
+      emit(vscodeToolName(id), args);
+    }
+  }
+  for (const v of Object.values(node)) walkVscodeTools(v, emit, depth + 1);
+}
+
 const PARSERS = {
   /* Claude Code / Claude Desktop agent mode: JSONL, assistant messages with tool_use blocks. */
   claudeStream(file, agent) {
@@ -475,6 +524,18 @@ const PARSERS = {
         let args; try { args = JSON.parse(p.arguments || "{}"); } catch { args = {}; }
         handleTool(agent, p.name || "", args, d.timestamp);
       }
+    }
+  },
+  /* VS Code chat / agent mode: one JSON file per session under workspaceStorage. */
+  vscodeChatSessions(file, agent) {
+    agentRec(agent).sessions++;
+    const txt = readText(file); if (txt === null) return;
+    let d; try { d = JSON.parse(txt); } catch { return; }
+    const reqs = Array.isArray(d && d.requests) ? d.requests : [d];
+    const fallbackTs = vscodeTs(d && (d.creationDate || d.lastMessageDate));
+    for (const req of reqs) {
+      const ts = vscodeTs(req && (req.timestamp || req.startTime)) || fallbackTs;
+      walkVscodeTools(req, (name, args) => handleTool(agent, name, args, ts));
     }
   },
   /* VS Code-family editors (Cursor et al.): conversations in a SQLite key/value store.
@@ -543,7 +604,7 @@ function scanMcpConfigs(host, prof) {
       }
       continue;
     }
-    const cfg = readJson(p);
+    const cfg = src.jsonc ? readJsonc(p) : readJson(p);
     if (!cfg) continue;
     if (src.expandProjects) {                         // per-project blocks + their own file
       const ex = src.expandProjects;
@@ -556,8 +617,8 @@ function scanMcpConfigs(host, prof) {
       }
       continue;
     }
-    for (const key of src.jsonKeys || []) {           // first key that exists wins
-      const entries = cfg[key] || {};
+    for (const key of src.jsonKeys || []) {           // first key that exists wins; may be dotted
+      const entries = jsonAt(cfg, key) || {};
       if (Object.keys(entries).length) {
         addServers(host.name, entries, prof, src.label, src.disabledFlagKey);
         break;
@@ -571,7 +632,10 @@ async function scanTranscripts(host, prof) {
     if (!parser) continue;
     const p = srcPath(prof, src);
     if (src.suffix) {
-      for (const f of walkFiles(p, src.suffix)) await parser(f, host.name, src, host);
+      for (const f of walkFiles(p, src.suffix)) {
+        if (src.mustContain && !f.includes(src.mustContain)) continue;
+        await parser(f, host.name, src, host);
+      }
     } else if (isFile(p)) {
       await parser(p, host.name, src, host);
     }

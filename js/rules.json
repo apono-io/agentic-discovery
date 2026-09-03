@@ -2153,6 +2153,121 @@
       "gap": "Cursor coverage is presence, configured MCP servers and a session count. Cursor 3.x moved conversation bodies into per-session stores encrypted with AES-GCM, so tool calls are deliberately not read; MCP attribution is available there as providerIdentifier/toolName if we later choose to. Note also that Cursor updates have been observed clearing local chat history, so 'no activity found' can mean history was wiped rather than unused. For forward-looking capture, Cursor's first-party afterMCPExecution hook reports server, tool, arguments and duration directly."
     },
     {
+      "name": "VS Code",
+      "presence": [
+        {
+          "root": "roaming",
+          "path": [
+            "Code",
+            "User"
+          ],
+          "evidence": "VS Code app data"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Code - Insiders",
+            "User"
+          ],
+          "evidence": "VS Code Insiders app data"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".vscode"
+          ],
+          "evidence": "~/.vscode"
+        },
+        {
+          "root": "home",
+          "path": [
+            ".vscode-server"
+          ],
+          "evidence": "VS Code remote/WSL server"
+        }
+      ],
+      "mcpConfigs": [
+        {
+          "root": "roaming",
+          "path": [
+            "Code",
+            "User",
+            "mcp.json"
+          ],
+          "jsonKeys": [
+            "servers",
+            "mcpServers"
+          ],
+          "jsonc": true,
+          "label": "VS Code user mcp.json"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Code - Insiders",
+            "User",
+            "mcp.json"
+          ],
+          "jsonKeys": [
+            "servers",
+            "mcpServers"
+          ],
+          "jsonc": true,
+          "label": "VS Code Insiders mcp.json"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Code",
+            "User",
+            "settings.json"
+          ],
+          "jsonKeys": [
+            "mcp.servers",
+            "chat.mcp.servers"
+          ],
+          "jsonc": true,
+          "label": "VS Code settings.json"
+        }
+      ],
+      "transcripts": [
+        {
+          "root": "roaming",
+          "path": [
+            "Code",
+            "User",
+            "workspaceStorage"
+          ],
+          "suffix": ".json",
+          "mustContain": "chatSessions",
+          "parser": "vscodeChatSessions"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Code",
+            "User",
+            "globalStorage"
+          ],
+          "suffix": ".json",
+          "mustContain": "chatSessions",
+          "parser": "vscodeChatSessions"
+        },
+        {
+          "root": "roaming",
+          "path": [
+            "Code - Insiders",
+            "User",
+            "workspaceStorage"
+          ],
+          "suffix": ".json",
+          "mustContain": "chatSessions",
+          "parser": "vscodeChatSessions"
+        }
+      ],
+      "gap": "VS Code coverage reads chat/agent session files, which record tool calls including terminal commands. Workspace-level .vscode/mcp.json files are not scanned, so a server configured only for one project is not listed. Session files are pruned by VS Code over time, so 'no activity found' can mean history aged out rather than unused."
+    },
+    {
       "name": "GitHub Copilot",
       "presence": [
         {
@@ -2203,19 +2318,6 @@
       ],
       "mcpConfigs": [
         {
-          "root": "roaming",
-          "path": [
-            "Code",
-            "User",
-            "mcp.json"
-          ],
-          "jsonKeys": [
-            "servers",
-            "mcpServers"
-          ],
-          "label": "VS Code user mcp.json"
-        },
-        {
           "root": "home",
           "path": [
             ".copilot",
@@ -2228,7 +2330,7 @@
           "label": "Copilot CLI mcp-config.json"
         }
       ],
-      "gap": "Copilot tool-call history is not readable locally in this version; presence and configured MCP servers only."
+      "gap": "Copilot's own CLI keeps no readable local tool history: for the CLI this is presence and configured MCP servers only. Copilot Chat inside VS Code is covered under VS Code, whose session files do record tool calls."
     },
     {
       "name": "Google Antigravity",
@@ -2336,6 +2438,7 @@
     "Claude Desktop",
     "Codex",
     "Cursor",
+    "VS Code",
     "GitHub Copilot"
   ],
   "genericGaps": [

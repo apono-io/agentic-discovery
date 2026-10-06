@@ -1825,7 +1825,13 @@ const R = {
     "list_accounts",
     "find_accounts",
     "list_integrations",
-    "get_integration"
+    "get_integration",
+    "search_access",
+    "resume_tool_call",
+    "list_targets",
+    "setup_target",
+    "get_gateway_log",
+    "submit_feedback"
   ],
   "gatewayWrapperRegex": "^apn_[0-9a-f]+__(.+)$",
   "resourceGroups": {
@@ -2992,7 +2998,8 @@ const R = {
       "unknown": "needs review"
     },
     "note": "Catalog status as of 2026-08-31: AWS and Kubernetes GA; PostgreSQL, MySQL, MongoDB, Snowflake and Databricks GA; native Atlassian, GitHub, monday.com, Mixpanel and Okta integrations; Azure, GitLab and JFrog Artifactory on the roadmap. Anything marked 'supported via custom OAuth MCP' is reachable through Apono's custom OAuth MCP support, which covers most OAuth MCP servers (unauthenticated, dynamic client registration, and client-ID authentication). This is a PRODUCT FACT THAT CHANGES -- re-check it against the current integration catalog before putting an assessment in front of a customer."
-  }
+  },
+  "gatewayAliasRegex": "(^|[_-])apono([_-](agentic|mcp|gateway|gw|prod|staging))?([_-]|$)|apono-agentic"
 };
 
 // ---------------------------------------------------------------- small fs helpers
@@ -3328,6 +3335,7 @@ function handleShell(cmd, agent, ts) {
 }
 
 // ---------------------------------------------------------------- tool handling
+const GATEWAY_RX = R.gatewayAliasRegex ? new RegExp(R.gatewayAliasRegex) : null;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const WRAPPER_RE = new RegExp(R.gatewayWrapperRegex);
 function handleTool(agent, name, args, ts) {
@@ -3383,14 +3391,15 @@ function handleTool(agent, name, args, ts) {
     return;
   }
   const isControl = (t) => R.gatewayControlTools.some((c) => t === c || t.endsWith(c));
-  if (R.gatewayAliases.includes(sl) && isControl(tool)) return;
+  const isGateway = R.gatewayAliases.includes(sl) || (GATEWAY_RX && GATEWAY_RX.test(sl));
+  if (isGateway && isControl(tool)) return;
   let cat = categorize(tool, args && typeof args === "object" ? args : {});
   let innerTool = tool;
   if (args && typeof args === "object" && "tool_name" in args) { // gateway-style wrapper
     const m = WRAPPER_RE.exec(String(args.tool_name || ""));
     if (m) {
       innerTool = m[1];
-      if (R.gatewayAliases.includes(sl) && isControl(innerTool)) return;   // control plane, wrapped
+      if (isGateway && isControl(innerTool)) return;   // control plane, wrapped
       let raw = args.arguments;
       if (typeof raw === "string") {
         try { raw = JSON.parse(raw); }

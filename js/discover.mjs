@@ -354,6 +354,7 @@ function handleShell(cmd, agent, ts) {
 }
 
 // ---------------------------------------------------------------- tool handling
+const GATEWAY_RX = R.gatewayAliasRegex ? new RegExp(R.gatewayAliasRegex) : null;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const WRAPPER_RE = new RegExp(R.gatewayWrapperRegex);
 function handleTool(agent, name, args, ts) {
@@ -409,14 +410,15 @@ function handleTool(agent, name, args, ts) {
     return;
   }
   const isControl = (t) => R.gatewayControlTools.some((c) => t === c || t.endsWith(c));
-  if (R.gatewayAliases.includes(sl) && isControl(tool)) return;
+  const isGateway = R.gatewayAliases.includes(sl) || (GATEWAY_RX && GATEWAY_RX.test(sl));
+  if (isGateway && isControl(tool)) return;
   let cat = categorize(tool, args && typeof args === "object" ? args : {});
   let innerTool = tool;
   if (args && typeof args === "object" && "tool_name" in args) { // gateway-style wrapper
     const m = WRAPPER_RE.exec(String(args.tool_name || ""));
     if (m) {
       innerTool = m[1];
-      if (R.gatewayAliases.includes(sl) && isControl(innerTool)) return;   // control plane, wrapped
+      if (isGateway && isControl(innerTool)) return;   // control plane, wrapped
       let raw = args.arguments;
       if (typeof raw === "string") {
         try { raw = JSON.parse(raw); }

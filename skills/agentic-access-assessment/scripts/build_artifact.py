@@ -184,6 +184,7 @@ tr.open .caret{transform:rotate(90deg)}
 }
 .path-cli{color:var(--accent); background:var(--accent-soft); border:1px solid var(--accent-line)}
 .path-mcp{color:var(--muted); background:var(--surface-2); border:1px solid var(--line)}
+.path small{font-weight:400; opacity:.75}
 .acc{font:500 12px/1 "IBM Plex Mono",monospace; padding:4px 7px; border-radius:4px; white-space:nowrap}
 .acc-read{color:var(--muted); background:var(--surface-2)}
 .acc-write{color:var(--accent); background:var(--accent-soft)}
@@ -421,7 +422,16 @@ function render() {
     const c1 = el("td");
     c1.appendChild(el("span", "badge cov-" + t.coverage, covLabel[t.coverage] || t.coverage));
     tr.appendChild(c1);
-    for (const v of [kids.length, t.machines])
+    const kMachines = new Set(); let kCalls = 0;
+    const pc = { CLI: 0, MCP: 0, both: 0, other: 0 }; let builtin = false;
+    for (const k of kids) {
+      k.machines.forEach((m) => kMachines.add(m)); kCalls += k.calls;
+      const hasC = k.tools.some((x) => x.startsWith("CLI:"));
+      const hasM = k.tools.some((x) => x.startsWith("MCP:"));
+      if (k.tools.some((x) => x.startsWith("Built-in:") || x.startsWith("Browser:"))) builtin = true;
+      pc[hasC && hasM ? "both" : hasC ? "CLI" : hasM ? "MCP" : "other"] += k.calls;
+    }
+    for (const v of [kids.length, kMachines.size])
       tr.appendChild(el("td", "num", String(v)));
     const itd = el("td", "intentcell");
     for (const c of INTENTS) {
@@ -434,13 +444,21 @@ function render() {
     }
     if (!itd.childNodes.length) itd.appendChild(el("span", "tools", "unclassified"));
     tr.appendChild(itd);
-    tr.appendChild(el("td", "num", String(t.calls)));
+    tr.appendChild(el("td", "num", String(kCalls)));
+    // Pills come from the filtered resources, and carry the call share when one path is a
+    // sliver -- "both" on 621 CLI calls and 2 MCP calls is true but says the wrong thing alone.
     const pt = el("td");
-    for (const p of t.paths || []) {
-      const cls = p === "CLI" ? "path path-cli" : "path path-mcp";
-      pt.appendChild(el("span", cls, p === "Built-in" ? "built-in" : p.toLowerCase()));
-    }
-    pt.title = t.tools + " distinct tools";
+    const total = kCalls || 1;
+    const pill = (label, cls, share) => {
+      const sp = el("span", cls, label);
+      if (share < 0.1) sp.appendChild(el("small", null, " " + (Math.round(share * 100) || "<1") + "%"));
+      pt.appendChild(sp);
+    };
+    if (pc.CLI || pc.both) pill("cli", "path path-cli", (pc.CLI + pc.both) / total);
+    if (pc.MCP || pc.both) pill("mcp", "path path-mcp", (pc.MCP + pc.both) / total);
+    if (builtin || (pc.other && !pc.CLI && !pc.MCP && !pc.both)) pill("built-in", "path path-mcp", 1);
+    pt.title = "calls by path \u2014 CLI " + pc.CLI + " \u00b7 MCP " + pc.MCP +
+               (pc.both ? " \u00b7 both " + pc.both : "") + (pc.other ? " \u00b7 other " + pc.other : "");
     tr.appendChild(pt);
     tbody.appendChild(tr);
 

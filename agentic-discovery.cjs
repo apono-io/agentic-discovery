@@ -2999,7 +2999,18 @@ const R = {
     },
     "note": "Catalog status as of 2026-08-31: AWS and Kubernetes GA; PostgreSQL, MySQL, MongoDB, Snowflake and Databricks GA; native Atlassian, GitHub, monday.com, Mixpanel and Okta integrations; Azure, GitLab and JFrog Artifactory on the roadmap. Anything marked 'supported via custom OAuth MCP' is reachable through Apono's custom OAuth MCP support, which covers most OAuth MCP servers (unauthenticated, dynamic client registration, and client-ID authentication). This is a PRODUCT FACT THAT CHANGES -- re-check it against the current integration catalog before putting an assessment in front of a customer."
   },
-  "gatewayAliasRegex": "(^|[_-])apono([_-](agentic|mcp|gateway|gw|prod|staging))?([_-]|$)|apono-agentic"
+  "gatewayAliasRegex": "(^|[_-])apono([_-](agentic|mcp|gateway|gw|prod|staging))?([_-]|$)|apono-agentic",
+  "gatewaySignatureTools": [
+    "ask_access_assistant",
+    "create_access_request",
+    "get_request_details",
+    "list_available_resources",
+    "list_resources_filtered",
+    "execute_tool",
+    "search_access",
+    "resume_tool_call"
+  ],
+  "gatewayLabel": "(Apono gateway)"
 };
 
 // ---------------------------------------------------------------- small fs helpers
@@ -3336,6 +3347,17 @@ function handleShell(cmd, agent, ts) {
 
 // ---------------------------------------------------------------- tool handling
 const GATEWAY_RX = R.gatewayAliasRegex ? new RegExp(R.gatewayAliasRegex) : null;
+/* The gateway is installed under whatever name the user chose, so it is recognised by the tools
+   it exposes -- apn_<hash>__ wrapped tools, _proxy__ tools, and its own access-request tools --
+   and the name list is only a hint. Once a server shows the signature it stays a gateway. */
+const GATEWAY_SERVERS = new Set();
+/* Label for the report: a server recognised as the gateway says so, whatever it was named locally. */
+const gatewayTag = (server) =>
+  GATEWAY_SERVERS.has(String(server).toLowerCase().replace(/ \(.*\)$/, "")) ? " " + (R.gatewayLabel || "(Apono gateway)") : "";
+const GATEWAY_SIG = R.gatewaySignatureTools || [];
+const gatewaySignature = (tool, args) =>
+  WRAPPER_RE.test(tool) || tool.startsWith("_proxy__") || GATEWAY_SIG.includes(tool) ||
+  (args && typeof args === "object" && typeof args.tool_name === "string" && WRAPPER_RE.test(args.tool_name));
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const WRAPPER_RE = new RegExp(R.gatewayWrapperRegex);
 function handleTool(agent, name, args, ts) {
@@ -3358,6 +3380,10 @@ function handleTool(agent, name, args, ts) {
   }
   if (!server) return; // built-in / local tool
   const sl = server.toLowerCase();
+  // session tooling (feedback, cowork) is never the gateway, even when its name says "apono"
+  if (!R.infraServers.includes(sl) &&
+      (gatewaySignature(tool, args) || R.gatewayAliases.includes(sl) || (GATEWAY_RX && GATEWAY_RX.test(sl))))
+    GATEWAY_SERVERS.add(sl);
   let base = server;
   if (UUID_RE.test(server)) {
     if (!CONNECTOR_NAMES.has(server)) {
@@ -3391,7 +3417,7 @@ function handleTool(agent, name, args, ts) {
     return;
   }
   const isControl = (t) => R.gatewayControlTools.some((c) => t === c || t.endsWith(c));
-  const isGateway = R.gatewayAliases.includes(sl) || (GATEWAY_RX && GATEWAY_RX.test(sl));
+  const isGateway = GATEWAY_SERVERS.has(sl);
   if (isGateway && isControl(tool)) return;
   let cat = categorize(tool, args && typeof args === "object" ? args : {});
   let innerTool = tool;
@@ -3884,7 +3910,7 @@ function buildReport() {
   const mcpRows = [...MCP.values()].sort((x, y) => y.used - x.used || cmp(x.agent, y.agent)
                                                    || cmp(x.server, y.server));
   for (const r of mcpRows)
-    add(`| ${mdSafe(r.agent)} | ${mdSafe(r.server)} | ${r.configured ? "yes (" + [...r.source].sort().map(mdSafe).join(", ") + ")" : "no (seen in history only)"} ` +
+    add(`| ${mdSafe(r.agent)} | ${mdSafe(r.server)}${gatewayTag(r.server)} | ${r.configured ? "yes (" + [...r.source].sort().map(mdSafe).join(", ") + ")" : "no (seen in history only)"} ` +
         `| ${r.used ? "yes" : "NO -- configured but never used"} | ${r.used || "-"} | ${fmtTs(r.last)} |`);
   if (!mcpRows.length) add("| - | - | - | - | - | - |");
   add(""); add("## Resources accessed"); add("");

@@ -388,6 +388,7 @@ for (const k in byType) byType[k].sort((a, b) => b.calls - a.calls);
 
 const tbody = document.getElementById("tbody");
 let state = { acc: "all", cov: "all", q: "" };
+const openTypes = new Set();   // drill-downs the reader has expanded; survive re-render
 
 function matchesRes(r) {
   if (INTENTS.includes(state.acc) && !r.categories.includes(state.acc)) return false;
@@ -463,7 +464,8 @@ function render() {
     tbody.appendChild(tr);
 
     const det = el("tr", "detail");
-    det.hidden = true;
+    det.hidden = !openTypes.has(t.type);
+    if (!det.hidden) { tr.classList.add("open"); tr.setAttribute("aria-expanded", "true"); }
     const dtd = el("td");
     dtd.colSpan = 7;
     const inner = el("div", "inner");
@@ -501,6 +503,7 @@ function render() {
 
     const toggle = () => {
       const open = det.hidden;
+      if (open) openTypes.add(t.type); else openTypes.delete(t.type);
       det.hidden = !open;
       tr.classList.toggle("open", open);
       tr.setAttribute("aria-expanded", String(open));
@@ -516,9 +519,10 @@ render();
 
 for (const b of document.querySelectorAll("button.chip"))
   b.addEventListener("click", () => {
-    state.acc = b.dataset.acc;
+    // clicking the chip that is already pressed releases it back to "all"
+    state.acc = (state.acc === b.dataset.acc && b.dataset.acc !== "all") ? "all" : b.dataset.acc;
     for (const o of document.querySelectorAll("button.chip"))
-      o.setAttribute("aria-pressed", String(o === b));
+      o.setAttribute("aria-pressed", String(o.dataset.acc === state.acc));
     render();
   });
 cov.addEventListener("change", () => { state.cov = cov.value; render(); });
